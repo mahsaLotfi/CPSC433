@@ -2,8 +2,6 @@ package ca.ucalgary.cpsc433;
 
 import java.util.PriorityQueue;
 
-import ca.ucalgary.cpsc433.schedule.Assign;
-
 /**
  * 
  * a fixed-size population of assignments
@@ -12,22 +10,22 @@ import ca.ucalgary.cpsc433.schedule.Assign;
 public class Population{
 	private int maxSize;
 	private int size;
-	private Assign leastFit;
-	private PriorityQueue<Assign> pq;
+	private Individual leastFit;
+	private PriorityQueue<Individual> pq;
 	
 	public Population(int maxSize) {
 		size = 0;
 		leastFit = null;
 		this.maxSize = maxSize;
-		pq = new PriorityQueue<Assign>();
+		pq = new PriorityQueue<Individual>();
 	}
 	
 	/**
 	 * 
-	 * @param e assignment to be added
+	 * @param e individual to be added
 	 * @return true if added successfully
 	 */
-	public boolean add(Assign e) {
+	public boolean add(Individual e) {
 		if (leastFit != null) {
 		    if (e.compareTo(leastFit)<0) 
 			    leastFit = e;
@@ -43,7 +41,7 @@ public class Population{
 	 * 
 	 * @return
 	 */
-	public Assign fittest() {
+	public Individual fittest() {
 		return pq.peek();
 	}
 	
