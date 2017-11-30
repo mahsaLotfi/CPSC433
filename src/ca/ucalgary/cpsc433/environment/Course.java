@@ -5,8 +5,10 @@ package ca.ucalgary.cpsc433.environment;
  */
 public interface Course extends Comparable<Course> {
 
-    public String getName();
+    public String getType();
 
     public int getNumber();
+
+    public int getSection();
 
 }

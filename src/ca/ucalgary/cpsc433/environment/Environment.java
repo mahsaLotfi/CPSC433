@@ -1,9 +1,17 @@
 package ca.ucalgary.cpsc433.environment;
 
+import ca.ucalgary.cpsc433.schedule.Slot;
+
 /**
  * @author Obicere
  */
 public class Environment {
+
+    private final String name;
+
+    private final Slot[] labSlots;
+
+    private final Slot[] lectureSlots;
 
     private final Lab[] labs;
 
@@ -19,7 +27,10 @@ public class Environment {
 
     private final Unwanted[] unwanted;
 
-    public Environment(final Lecture[] lectures, final Lab[] labs, final NotCompatible[] notCompatibles, final Pair[] pairs, final PartialAssign[] partialAssigns, final Preference[] preferences, final Unwanted[] unwanted) {
+    public Environment(final String name, final Slot[] labSlots, final Slot[] lectureSlots, final Lecture[] lectures, final Lab[] labs, final NotCompatible[] notCompatibles, final Pair[] pairs, final PartialAssign[] partialAssigns, final Preference[] preferences, final Unwanted[] unwanted) {
+        this.name = name;
+        this.labSlots = labSlots;
+        this.lectureSlots = lectureSlots;
         this.labs = labs;
         this.lectures = lectures;
         this.notCompatibles = notCompatibles;
@@ -27,6 +38,18 @@ public class Environment {
         this.partialAssigns = partialAssigns;
         this.preferences = preferences;
         this.unwanted = unwanted;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Slot[] getLabSlots() {
+        return labSlots.clone();
+    }
+
+    public Slot[] getLectureSlots() {
+        return lectureSlots.clone();
     }
 
     public int getLabCount() {
