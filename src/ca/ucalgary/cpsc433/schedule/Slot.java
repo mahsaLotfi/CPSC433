@@ -40,6 +40,14 @@ public class Slot {
         return min;
     }
 
+    public boolean isValidLectureSlot() {
+        return time.isValidLectureTime(day);
+    }
+
+    public boolean isValidLabSlot() {
+        return time.isValidLabTime(day);
+    }
+
     @Override
     public int hashCode() {
         return 31 * day.hashCode() + time.hashCode();

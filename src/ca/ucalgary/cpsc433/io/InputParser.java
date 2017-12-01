@@ -93,10 +93,20 @@ public class InputParser {
                         this.name = parseName(buffer);
                         break;
                     case "Course slots:":
-                        lectureSlots.add(parseSlot(buffer));
+                        final Slot lectureSlot = parseSlot(buffer);
+                        if (lectureSlot.isValidLectureSlot()) {
+                            lectureSlots.add(lectureSlot);
+                        } else {
+                            System.out.println("Warning: invalid lecture slot: " + lectureSlot);
+                        }
                         break;
                     case "Lab slots:":
-                        labSlots.add(parseSlot(buffer));
+                        final Slot labSlot = parseSlot(buffer);
+                        if (labSlot.isValidLabSlot()) {
+                            labSlots.add(labSlot);
+                        } else {
+                            System.out.println("Warning: invalid lab slot: " + labSlot);
+                        }
                         break;
                     case "Courses:":
                         lectures.add(parseLecture(buffer));
@@ -143,8 +153,8 @@ public class InputParser {
 
         System.out.println();
 
-        for(final Lecture lecture : lectures) {
-            if(labAssignments.get(lecture) == null) {
+        for (final Lecture lecture : lectures) {
+            if (labAssignments.get(lecture) == null) {
                 System.out.println(lecture + "=[]");
             }
         }

@@ -28,8 +28,89 @@ public class Time implements Comparable<Time> {
         return minute;
     }
 
-    public boolean isAfter1800() {
+    public boolean isEvening() {
         return hour >= 18;
+    }
+
+    public boolean isValidLabTime(final Day day) {
+        if (day == Day.MONDAY || day == Day.TUESDAY) {
+            switch (formatInt()) {
+                case 800:
+                case 900:
+                case 1000:
+                case 1100:
+                case 1200:
+                case 1300:
+                case 1400:
+                case 1500:
+                case 1600:
+                case 1700:
+                case 1800:
+                case 1900:
+                case 2000:
+                    return true;
+                default:
+                    return false;
+            }
+        } else if (day == Day.FRIDAY) {
+            switch (formatInt()) {
+                case 800:
+                case 1000:
+                case 1200:
+                case 1400:
+                case 1600:
+                case 1800:
+                    return true;
+                default:
+                    return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isValidLectureTime(final Day day) {
+        if (day == Day.MONDAY) {
+            switch (formatInt()) {
+                case 800:
+                case 900:
+                case 1000:
+                case 1100:
+                case 1200:
+                case 1300:
+                case 1400:
+                case 1500:
+                case 1600:
+                case 1700:
+                case 1800:
+                case 1900:
+                case 2000:
+                    return true;
+                default:
+                    return false;
+            }
+        } else if (day == Day.TUESDAY) {
+            switch (formatInt()) {
+                case 800:
+                case 930:
+                case 1100:
+                case 1230:
+                case 1400:
+                case 1530:
+                case 1700:
+                case 1830:
+                    return true;
+                default:
+                    return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    private int formatInt() {
+        // outputs the time in HHMM format in decimal
+        return hour * 100 + minute;
     }
 
     @Override
