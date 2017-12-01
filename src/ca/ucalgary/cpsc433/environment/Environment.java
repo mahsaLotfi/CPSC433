@@ -1,5 +1,7 @@
 package ca.ucalgary.cpsc433.environment;
 
+import com.sun.corba.se.impl.interceptors.SlotTableStack;
+
 import ca.ucalgary.cpsc433.schedule.Slot;
 
 /**
@@ -50,6 +52,10 @@ public class Environment {
 
     public Slot[] getLectureSlots() {
         return lectureSlots.clone();
+    }
+    
+    public int getSlotCount() {
+    	return lectureSlots.length;
     }
 
     public int getLabCount() {

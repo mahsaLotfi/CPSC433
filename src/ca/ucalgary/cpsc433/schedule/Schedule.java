@@ -81,4 +81,8 @@ public class Schedule implements Cloneable {
             }
         }
     }
+    
+    public int size() {
+    	return assigns.length;
+    }
 }
