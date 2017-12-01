@@ -2,6 +2,8 @@ package ca.ucalgary.cpsc433.schedule;
 
 import ca.ucalgary.cpsc433.environment.Environment;
 
+import java.util.Arrays;
+
 /**
  * @author Obicere
  */
@@ -36,6 +38,10 @@ public class Schedule implements Cloneable {
     public Assign[] getAssigns() {
         // note the clone call here. O(n), don't use excessively.
         return assigns.clone();
+    }
+
+    public Assign[] getAssigns(final int start, final int length) {
+        return Arrays.copyOfRange(assigns, start, length);
     }
 
     public Schedule insert(final Assign[] assigns) {
