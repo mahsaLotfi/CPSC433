@@ -20,6 +20,7 @@ public class Population{
 	private SortedList<Individual> sl;
 	private Environment env;
 	private HardConstraint hc;
+	private int generation;
 	Random rand;
 	
 	public Population(int maxSize, Environment e) {
@@ -28,6 +29,7 @@ public class Population{
 		this.maxSize = maxSize;
 		hc = new HardConstraint();
 		sl = new SortedList<Individual>();
+		generation = 0;
 	}
 	
 	/**
@@ -78,6 +80,8 @@ public class Population{
 		if (hc.isSatisfied(sndChild)) {
 			this.add(new Individual(sndChild, sndChild.getEvaluation(env)));
 		}
+		
+		++generation;
 	}
 	
 	/**
@@ -119,6 +123,10 @@ public class Population{
 			}
 		}
 		
+	}
+	
+	public int getGeneration() {
+		return generation;
 	}
 	
 	
