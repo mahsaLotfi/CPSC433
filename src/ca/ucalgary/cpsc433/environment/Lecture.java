@@ -33,6 +33,9 @@ public class Lecture implements Course {
     }
 
     public Lab[] getLabs() {
+        if(labs == null) {
+            return null;
+        }
         return labs.clone();
     }
 
@@ -90,5 +93,17 @@ public class Lecture implements Course {
         }
         final Lecture other = (Lecture) o;
         return getType().equals(other.getType()) && getNumber() == other.getNumber() && getSection() == other.getSection();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(type);
+        builder.append(' ');
+        builder.append(number);
+        builder.append(" LEC ");
+        builder.append(section < 10 ? "0" : "");
+        builder.append(section);
+        return builder.toString();
     }
 }

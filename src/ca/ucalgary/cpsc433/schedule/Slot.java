@@ -5,17 +5,24 @@ package ca.ucalgary.cpsc433.schedule;
  */
 public class Slot {
 
-    private final Day day = null;
+    private final Day day;
 
-    private final Time time = null;
+    private final Time time;
 
-    private final int minLectures = 0;
+    private final int max;
 
-    private final int maxLectures = 0;
+    private final int min;
 
-    private final int minLabs = 0;
+    public Slot(final Day day, final Time time) {
+        this(day, time, 0, 0);
+    }
 
-    private final int maxLabs = 0;
+    public Slot(final Day day, final Time time, final int max, final int min) {
+        this.day = day;
+        this.time = time;
+        this.max = max;
+        this.min = min;
+    }
 
     public Day getDay() {
         return day;
@@ -25,19 +32,36 @@ public class Slot {
         return time;
     }
 
-    public int getMinLectures() {
-        return minLectures;
+    public int getMax() {
+        return max;
     }
 
-    public int getMaxLectures() {
-        return maxLectures;
+    public int getMin() {
+        return min;
     }
 
-    public int getMinLabs() {
-        return minLabs;
+    @Override
+    public int hashCode() {
+        return 31 * day.hashCode() + time.hashCode();
     }
 
-    public int getMaxLabs() {
-        return maxLabs;
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
+        if (!(o instanceof Slot)) {
+            return false;
+        }
+        final Slot other = (Slot) o;
+        return getDay().equals(other.getDay()) && getTime().equals(other.getTime());
+    }
+
+    @Override
+    public String toString() {
+        return day + ", " + time;
     }
 }

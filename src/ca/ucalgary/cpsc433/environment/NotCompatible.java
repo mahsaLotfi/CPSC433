@@ -16,41 +16,40 @@ public class NotCompatible {
         if (right == null) {
             throw new NullPointerException("right must be non-null.");
         }
-
-        final int cmp = left.compareTo(right);
-        // insert the elements into the correct order, halves the number of instances
-        if (cmp <= 0) {
-            this.left = left;
-            this.right = right;
-        } else {
-            this.right = left;
-            this.left = right;
-        }
+        this.left = left;
+        this.right = right;
     }
 
-    /**
-     * Apply transitivity. If <code>a</code> is not compatible with
-     * <code>b</code>, and <code>b</code> is not compatible with
-     * <code>c</code>, then <code>a</code> is not compatible with
-     * <code>c</code>.
-     *
-     * @param other The other non-compatibility to extend with.
-     * @return <code>null</code> if transitivity does not apply. Otherwise,
-     * the tuple storing the transitive elements.
-     */
-    public NotCompatible extend(final NotCompatible other) {
-        final Course otherLeft = other.left;
-        final Course otherRight = other.right;
-
-        if (otherLeft.equals(right)) {
-            return new NotCompatible(left, otherRight);
-        }
-
-        if (otherRight.equals(left)) {
-            return new NotCompatible(otherLeft, right);
-        }
-
-        return null;
+    public Course getLeft() {
+        return left;
     }
 
+    public Course getRight() {
+        return right;
+    }
+
+    @Override
+    public int hashCode() {
+        return left.hashCode() * 31 + right.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
+        if (!(o instanceof NotCompatible)) {
+            return false;
+        }
+        final NotCompatible other = (NotCompatible) o;
+        return getLeft().equals(other.getLeft()) && getRight().equals(other.getRight());
+    }
+
+    @Override
+    public String toString() {
+        return "NotCompatible[" + left + ", " + right + "]";
+    }
 }

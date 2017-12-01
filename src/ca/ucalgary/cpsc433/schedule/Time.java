@@ -3,27 +3,67 @@ package ca.ucalgary.cpsc433.schedule;
 /**
  * @author Obicere
  */
-public class Time {
+public class Time implements Comparable<Time> {
 
-    // format: "HH:MM"
-    private final String time;
+    private final int hour;
 
-    public Time(final String time) {
-        if (time == null) {
-            throw new NullPointerException("time must be non-null.");
+    private final int minute;
+
+    public Time(final int hour, final int minute) {
+        if (hour < 0 || hour >= 24) {
+            throw new IllegalArgumentException("hour must be in range [0, 23]: " + hour);
         }
-        this.time = time;
+        if (minute < 0 || minute >= 60) {
+            throw new IllegalArgumentException("minute must be in range [0, 59]: " + minute);
+        }
+        this.hour = hour;
+        this.minute = minute;
+    }
+
+    public int getHour() {
+        return hour;
+    }
+
+    public int getMinute() {
+        return minute;
     }
 
     public boolean isAfter1800() {
-        // example of why this class could be useful
+        return hour >= 18;
+    }
 
-        // TODO
-        return false;
+    @Override
+    public int hashCode() {
+        return hour * 60 + minute;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
+        if (!(o instanceof Time)) {
+            return false;
+        }
+        final Time other = (Time) o;
+        return other.getHour() == getHour() && other.getMinute() == getMinute();
     }
 
     @Override
     public String toString() {
-        return time;
+        return String.format("%02d:%02d", hour, minute);
+    }
+
+    @Override
+    public int compareTo(final Time o) {
+        final int hourCompare = Integer.compare(getHour(), o.getHour());
+        if (hourCompare != 0) {
+            return hourCompare;
+        } else {
+            return Integer.compare(getMinute(), o.getMinute());
+        }
     }
 }

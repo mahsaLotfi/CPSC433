@@ -27,17 +27,17 @@ public class Environment {
 
     private final Unwanted[] unwanted;
 
-    public Environment(final String name, final Slot[] labSlots, final Slot[] lectureSlots, final Lecture[] lectures, final Lab[] labs, final NotCompatible[] notCompatibles, final Pair[] pairs, final PartialAssign[] partialAssigns, final Preference[] preferences, final Unwanted[] unwanted) {
+    public Environment(final String name, final Slot[] labSlots, final Slot[] lectureSlots, final Lecture[] lectures, final Lab[] labs, final NotCompatible[] notCompatibles, final Unwanted[] unwanted, final Preference[] preferences, final Pair[] pairs, final PartialAssign[] partialAssigns) {
         this.name = name;
         this.labSlots = labSlots;
         this.lectureSlots = lectureSlots;
         this.labs = labs;
         this.lectures = lectures;
         this.notCompatibles = notCompatibles;
+        this.unwanted = unwanted;
+        this.preferences = preferences;
         this.pairs = pairs;
         this.partialAssigns = partialAssigns;
-        this.preferences = preferences;
-        this.unwanted = unwanted;
     }
 
     public String getName() {
@@ -72,19 +72,19 @@ public class Environment {
         return notCompatibles.clone();
     }
 
-    public Pair[] getPairs() {
-        return pairs.clone();
-    }
-
-    public PartialAssign[] getPartialAssigns() {
-        return partialAssigns.clone();
+    public Unwanted[] getUnwanted() {
+        return unwanted.clone();
     }
 
     public Preference[] getPreferences() {
         return preferences.clone();
     }
 
-    public Unwanted[] getUnwanted() {
-        return unwanted.clone();
+    public Pair[] getPairs() {
+        return pairs.clone();
+    }
+
+    public PartialAssign[] getPartialAssigns() {
+        return partialAssigns.clone();
     }
 }

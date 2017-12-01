@@ -7,18 +7,25 @@ public class Lab implements Course {
 
     private final Lecture lecture;
 
+    private final boolean isLab;
+
     private final int section;
 
-    public Lab(final Lecture lecture, final int section) {
-        if(lecture == null) {
+    public Lab(final Lecture lecture, final boolean isLab, final int section) {
+        if (lecture == null) {
             throw new NullPointerException("lecture must be non-null");
         }
         this.lecture = lecture;
+        this.isLab = isLab;
         this.section = section;
     }
 
     public Lecture getLecture() {
         return lecture;
+    }
+
+    public boolean isLab() {
+        return isLab;
     }
 
     @Override
@@ -70,5 +77,17 @@ public class Lab implements Course {
         }
         final Lab other = (Lab) o;
         return getLecture().equals(other.getLecture()) && getSection() == other.getSection();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(lecture.toString());
+        builder.append(' ');
+        builder.append(isLab ? "LAB" : "TUT");
+        builder.append(' ');
+        builder.append(section < 10 ? "0" : "");
+        builder.append(section);
+        return builder.toString();
     }
 }
