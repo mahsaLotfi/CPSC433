@@ -32,6 +32,18 @@ public class Slot {
         return time;
     }
 
+    public Time getLabEndTime() {
+        return time.add(1, 0);
+    }
+
+    public Time getLectureEndTime() {
+        if(day == Day.TUESDAY) {
+            return time.add(1, 30);
+        } else {
+            return time.add(1, 0);
+        }
+    }
+
     public int getMax() {
         return max;
     }

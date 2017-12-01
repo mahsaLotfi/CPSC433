@@ -1,6 +1,7 @@
 package ca.ucalgary.cpsc433.schedule;
 
 import ca.ucalgary.cpsc433.environment.Course;
+import ca.ucalgary.cpsc433.environment.Lecture;
 
 /**
  * @author Obicere
@@ -10,6 +11,8 @@ public class Assign {
     private final Course course;
 
     private final Slot slot;
+
+    private Time endTime;
 
     public Assign(final Course course, final Slot slot) {
         if (course == null) {
@@ -28,6 +31,26 @@ public class Assign {
 
     public Slot getSlot() {
         return slot;
+    }
+
+    public Time getStartTime() {
+        return slot.getTime();
+    }
+
+    public Time getEndTime() {
+        if (endTime != null) {
+            return endTime;
+        }
+        if (course instanceof Lecture) {
+            this.endTime = slot.getLectureEndTime();
+        } else {
+            this.endTime = slot.getLabEndTime();
+        }
+        return endTime;
+    }
+
+    public boolean contains(final Time time) {
+        return time.isInRange(getStartTime(), getEndTime());
     }
 
     @Override

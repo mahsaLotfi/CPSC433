@@ -32,6 +32,13 @@ public class Time implements Comparable<Time> {
         return hour >= 18;
     }
 
+    public boolean isInRange(final Time start, final Time end) {
+        final int compareStart = start.compareTo(this);
+        final int compareEnd = end.compareTo(this);
+
+        return compareStart <= 0 && compareEnd >= 0;
+    }
+
     public boolean isValidLabTime(final Day day) {
         if (day == Day.MONDAY || day == Day.TUESDAY) {
             switch (formatInt()) {
@@ -106,6 +113,13 @@ public class Time implements Comparable<Time> {
         } else {
             return false;
         }
+    }
+
+    public Time add(final int hours, final int minutes) {
+        final int mMod = (minute + minutes) % 60;
+        final int mDiv = (minute + minutes) / 60;
+        final int hMod = (hour + hours + mDiv) % 24;
+        return new Time(hMod, mMod);
     }
 
     private int formatInt() {
