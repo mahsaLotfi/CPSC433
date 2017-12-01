@@ -27,7 +27,7 @@ public class Population{
 	 */
 	public boolean add(Individual e) {
 		if (leastFit != null) {
-		    if (e.compareTo(leastFit)<0) 
+		    if (e.compareTo(leastFit) > 0) 
 			    leastFit = e;
 		} else leastFit = e;
 		if (size < maxSize)
