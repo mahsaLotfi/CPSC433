@@ -109,12 +109,17 @@ public class InputParser {
                         }
                         break;
                     case "Courses:":
-                        lectures.add(parseLecture(buffer));
+                        final Lecture lecture = parseLecture(buffer);
+                        lectures.add(lecture);
+                        labAssignments.putIfAbsent(lecture, new LinkedList<>());
                         break;
                     case "Labs:":
                         final Lab lab = parseLab(buffer);
-                        labAssignments.putIfAbsent(lab.getLecture(), new LinkedList<>());
-                        labAssignments.get(lab.getLecture()).add(lab);
+                        final List<Lab> assigns = labAssignments.get(lab.getLecture());
+                        if(assigns == null) {
+                            throw new AssertionError("Expected a lecture assignment list to exist before lab parsing.");
+                        }
+                        assigns.add(lab);
                         labs.add(lab);
                         break;
                     case "Not compatible:":
@@ -143,23 +148,12 @@ public class InputParser {
 
     private void assignLabs() {
         for (final Map.Entry<Lecture, List<Lab>> entry : labAssignments.entrySet()) {
-            System.out.println(entry);
             final Lecture lecture = entry.getKey();
             final List<Lab> labs = entry.getValue();
             final Lab[] labArray = labs.toArray(new Lab[labs.size()]);
 
             lecture.setLabs(labArray);
         }
-
-        System.out.println();
-
-        for (final Lecture lecture : lectures) {
-            if (labAssignments.get(lecture) == null) {
-                System.out.println(lecture + "=[]");
-            }
-        }
-
-        System.out.println();
     }
 
     private Environment getEnvironment() {

@@ -34,7 +34,7 @@ public class Lecture implements Course {
 
     public Lab[] getLabs() {
         if(labs == null) {
-            return null;
+            throw new AssertionError("Lecture has not yet been fully initialized.");
         }
         return labs.clone();
     }

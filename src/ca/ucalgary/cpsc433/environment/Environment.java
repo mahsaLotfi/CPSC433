@@ -27,10 +27,10 @@ public class Environment {
 
     private final Unwanted[] unwanted;
 
-    public Environment(final String name, final Slot[] labSlots, final Slot[] lectureSlots, final Lecture[] lectures, final Lab[] labs, final NotCompatible[] notCompatibles, final Unwanted[] unwanted, final Preference[] preferences, final Pair[] pairs, final PartialAssign[] partialAssigns) {
+    public Environment(final String name, final Slot[] lectureSlots, final Slot[] labSlots, final Lecture[] lectures, final Lab[] labs, final NotCompatible[] notCompatibles, final Unwanted[] unwanted, final Preference[] preferences, final Pair[] pairs, final PartialAssign[] partialAssigns) {
         this.name = name;
-        this.labSlots = labSlots;
         this.lectureSlots = lectureSlots;
+        this.labSlots = labSlots;
         this.labs = labs;
         this.lectures = lectures;
         this.notCompatibles = notCompatibles;
