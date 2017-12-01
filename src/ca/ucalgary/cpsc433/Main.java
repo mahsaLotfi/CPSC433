@@ -10,6 +10,10 @@ import ca.ucalgary.cpsc433.io.InputParser;
  */
 public class Main {
     public static void main(final String[] args) {
+        if(args.length == 0) {
+            System.err.println("Need to run main with input file as first parameter.");
+            return;
+        }
         final Environment environment;
         try {
             environment = InputParser.parseEnvironment(args[0]);
