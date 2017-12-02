@@ -1,6 +1,5 @@
 package ca.ucalgary.cpsc433.constraint.hard;
 
-import ca.ucalgary.cpsc433.constraint.Constraint;
 import ca.ucalgary.cpsc433.environment.Course;
 import ca.ucalgary.cpsc433.environment.Environment;
 import ca.ucalgary.cpsc433.schedule.Schedule;
@@ -9,7 +8,7 @@ import ca.ucalgary.cpsc433.schedule.Slot;
 /**
  * @author Obicere
  */
-public class LabMaxConstraint implements Constraint {
+public class LabMaxConstraint implements HardConstraint {
 
     @Override
     public boolean isSatisfied(final Schedule schedule) {

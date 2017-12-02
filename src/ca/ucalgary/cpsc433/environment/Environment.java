@@ -1,13 +1,22 @@
 package ca.ucalgary.cpsc433.environment;
 
-import com.sun.corba.se.impl.interceptors.SlotTableStack;
-
+import ca.ucalgary.cpsc433.constraint.hard.HardConstraint;
+import ca.ucalgary.cpsc433.constraint.hard.LabMaxConstraint;
+import ca.ucalgary.cpsc433.constraint.hard.LectureMaxConstraint;
+import ca.ucalgary.cpsc433.constraint.soft.SoftConstraint;
 import ca.ucalgary.cpsc433.schedule.Slot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Obicere
  */
 public class Environment {
+
+    private static final HardConstraint[] HARD_CONSTRAINTS;
+
+    private static final SoftConstraint[] SOFT_CONSTRAINTS;
 
     private final String name;
 
@@ -28,6 +37,21 @@ public class Environment {
     private final Preference[] preferences;
 
     private final Unwanted[] unwanted;
+
+    private final HardConstraint[] hardConstraints = HARD_CONSTRAINTS;
+
+    private final SoftConstraint[] softConstraints = SOFT_CONSTRAINTS;
+
+    static {
+        final List<HardConstraint> hard = new ArrayList<>();
+        hard.add(new LectureMaxConstraint());
+        hard.add(new LabMaxConstraint());
+
+        final List<SoftConstraint> soft = new ArrayList<>();
+
+        HARD_CONSTRAINTS = hard.toArray(new HardConstraint[hard.size()]);
+        SOFT_CONSTRAINTS = soft.toArray(new SoftConstraint[soft.size()]);
+    }
 
     public Environment(final String name, final Slot[] lectureSlots, final Slot[] labSlots, final Lecture[] lectures, final Lab[] labs, final NotCompatible[] notCompatibles, final Unwanted[] unwanted, final Preference[] preferences, final Pair[] pairs, final PartialAssign[] partialAssigns) {
         this.name = name;
@@ -53,9 +77,9 @@ public class Environment {
     public Slot[] getLectureSlots() {
         return lectureSlots.clone();
     }
-    
+
     public int getSlotCount() {
-    	return lectureSlots.length;
+        return lectureSlots.length;
     }
 
     public int getLabCount() {
@@ -92,5 +116,13 @@ public class Environment {
 
     public PartialAssign[] getPartialAssigns() {
         return partialAssigns.clone();
+    }
+
+    public HardConstraint[] getHardConstraints() {
+        return hardConstraints.clone();
+    }
+
+    public SoftConstraint[] getSoftConstraints() {
+        return softConstraints.clone();
     }
 }
