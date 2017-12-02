@@ -11,4 +11,6 @@ public interface SoftConstraint {
 
     public int getPenalty();
 
+    public int getWeight();
+
 }

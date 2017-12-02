@@ -20,6 +20,10 @@ public class Schedule implements Cloneable, Comparable<Schedule> {
 
     private int evaluation = -1;
 
+    private boolean valid = false;
+
+    private boolean validCached = false;
+
     public Schedule(final Environment environment) {
         this(environment, EMPTY_ASSIGNS);
     }
@@ -56,6 +60,19 @@ public class Schedule implements Cloneable, Comparable<Schedule> {
 
         this.evaluation = newEvaluation;
         return evaluation;
+    }
+
+    public boolean isValid() {
+        if (validCached) {
+            return valid;
+        }
+        boolean valid = false;
+
+        // TODO if there is no hard constraint that is unsatisfied, it is valid
+
+        this.valid = valid;
+        validCached = true;
+        return valid;
     }
 
     public Environment getEnvironment() {
