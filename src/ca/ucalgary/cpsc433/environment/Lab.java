@@ -44,6 +44,11 @@ public class Lab implements Course {
     }
 
     @Override
+    public boolean isLecture() {
+        return false;
+    }
+
+    @Override
     public int compareTo(final Course o) {
         if (o instanceof Lecture) {
             return 1;

@@ -11,4 +11,6 @@ public interface Course extends Comparable<Course> {
 
     public int getSection();
 
+    public boolean isLecture();
+
 }
