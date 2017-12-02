@@ -9,7 +9,7 @@ import ca.ucalgary.cpsc433.schedule.Slot;
 /**
  * @author Obicere
  */
-public class LectureMinConstraint implements Constraint {
+public class LabMaxConstraint implements Constraint {
 
     @Override
     public boolean isSatisfied(final Schedule schedule) {
