@@ -63,7 +63,7 @@ public class OrTree {
 
         depth++;
 
-        while (current != null) {
+        while (true) {
             current.assign();
 
             final Course course = getCourse(depth - 1);
@@ -72,7 +72,7 @@ public class OrTree {
             // System.out.println((depth - 1) + ": Assigning " + course + " to " + slot);
             schedule[depth - 1] = Assign.getAssign(course, slot);
 
-            final Schedule build = build();
+            Schedule build = build();
             if (build.isValid()) {
                 if (isComplete()) {
                     // System.out.println("Found valid solution");
@@ -81,9 +81,15 @@ public class OrTree {
             }
             if (!build.isValid() || current.isComplete()) {
                 // System.out.println("Found invalid solution");
-                current = current.previous;
-                depth--;
-                current.mark();
+                do {
+                    current = current.previous;
+                    depth--;
+                    if (current != null) {
+                        current.mark();
+                    } else {
+                        return null;
+                    }
+                } while (current.isComplete());
             }
 
             final int subCount = getSubtreeSize(depth);
@@ -91,8 +97,6 @@ public class OrTree {
 
             depth++;
         }
-
-        return null;
     }
 
     private Course getCourse(final int i) {
