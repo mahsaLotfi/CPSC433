@@ -73,6 +73,12 @@ public class Assign {
         return time.isInRange(getStartTime(), getEndTime());
     }
 
+    public boolean collides(final Assign other) {
+        final Time start = getStartTime();
+        final Time end = getEndTime();
+        return other.contains(start) || other.contains(end);
+    }
+
     @Override
     public int hashCode() {
         return course.hashCode() * 31 + slot.hashCode();
