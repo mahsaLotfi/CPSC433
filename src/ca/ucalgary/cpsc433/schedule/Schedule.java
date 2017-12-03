@@ -1,5 +1,7 @@
 package ca.ucalgary.cpsc433.schedule;
 
+import ca.ucalgary.cpsc433.constraint.hard.HardConstraint;
+import ca.ucalgary.cpsc433.constraint.soft.SoftConstraint;
 import ca.ucalgary.cpsc433.environment.Course;
 import ca.ucalgary.cpsc433.environment.Environment;
 
@@ -54,11 +56,16 @@ public class Schedule implements Cloneable, Comparable<Schedule> {
         if (evaluation != -1) {
             return evaluation;
         }
-        int newEvaluation = 0;
+        int evaluation = 0;
 
-        // TODO compute evaluation of soft constraints
+        final SoftConstraint[] softConstraints = environment.getSoftConstraints();
 
-        this.evaluation = newEvaluation;
+        for (final SoftConstraint constraint : softConstraints) {
+            final int violations = constraint.getViolations(this);
+            evaluation += (violations * constraint.getPenalty() * constraint.getWeight());
+        }
+
+        this.evaluation = evaluation;
         return evaluation;
     }
 
@@ -66,9 +73,17 @@ public class Schedule implements Cloneable, Comparable<Schedule> {
         if (validCached) {
             return valid;
         }
-        boolean valid = false;
+        boolean valid = true;
 
-        // TODO if there is no hard constraint that is unsatisfied, it is valid
+        final HardConstraint[] hardConstraints = environment.getHardConstraints();
+
+        for (final HardConstraint constraint : hardConstraints) {
+            final boolean satisfied = constraint.isSatisfied(this);
+            if (!satisfied) {
+                valid = false;
+                break;
+            }
+        }
 
         this.valid = valid;
         validCached = true;
