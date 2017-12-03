@@ -25,9 +25,9 @@ public class Schedule implements Cloneable, Comparable<Schedule> {
 
     private boolean validCached = false;
 
-    private int[] labCounts;
+    private byte[] labCounts;
 
-    private int[] lectureCounts;
+    private byte[] lectureCounts;
 
     public Schedule(final Environment environment) {
         this(environment, EMPTY_ASSIGNS);
@@ -67,8 +67,8 @@ public class Schedule implements Cloneable, Comparable<Schedule> {
     }
 
     private void buildCounts() {
-        labCounts = new int[environment.getSlotCount()];
-        lectureCounts = new int[environment.getSlotCount()];
+        labCounts = new byte[environment.getSlotCount()];
+        lectureCounts = new byte[environment.getSlotCount()];
 
         for (final Assign assign : assigns) {
             final Course course = assign.getCourse();
