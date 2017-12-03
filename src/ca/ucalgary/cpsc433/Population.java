@@ -2,7 +2,6 @@ package ca.ucalgary.cpsc433;
 
 
 import java.util.Random;
-import ca.ucalgary.cpsc433.constraint.HardConstraint;
 import ca.ucalgary.cpsc433.environment.Environment;
 import ca.ucalgary.cpsc433.schedule.Assign;
 import ca.ucalgary.cpsc433.schedule.Schedule;
@@ -19,7 +18,6 @@ public class Population{
 	private Individual leastFit;
 	private SortedList<Individual> sl;
 	private Environment env;
-	private HardConstraint hc;
 	private int generation;
 	Random rand;
 	
@@ -27,7 +25,6 @@ public class Population{
 		rand = new Random();
 		env = e;
 		this.maxSize = maxSize;
-		hc = new HardConstraint();
 		sl = new SortedList<Individual>();
 		generation = 0;
 	}
@@ -65,20 +62,19 @@ public class Population{
 		Assign[] diploid = new Assign[sl.get(0).size()];
 		System.arraycopy(fittest.getLeftHaploid(crossPoint), 0, diploid, 0, crossPoint);
 		System.arraycopy(random.getRightHaploid(crossPoint), 0, diploid, crossPoint, sl.get(0).size()-crossPoint);
-		Schedule fstChild = new Schedule();
-		fstChild = new Schedule(fstChild, diploid);
-		if (hc.isSatisfied(fstChild)) {
-			this.add(new Individual(fstChild, fstChild.getEvaluation(env)));
+		Schedule fstChild = new Schedule(env);
+		fstChild = new Schedule(env, diploid);
+		if (fstChild.isValid()) {
+			this.add(new Individual(fstChild, fstChild.getEvaluation()));
 		}
 		
 		// generate second child
 		diploid = new Assign[sl.get(0).size()];
 		System.arraycopy(random.getLeftHaploid(crossPoint), 0, diploid, 0, crossPoint);
 		System.arraycopy(fittest.getRightHaploid(crossPoint), 0, diploid, crossPoint, sl.get(0).size()-crossPoint);
-		Schedule sndChild = new Schedule();
-		sndChild = new Schedule(sndChild, diploid);
-		if (hc.isSatisfied(sndChild)) {
-			this.add(new Individual(sndChild, sndChild.getEvaluation(env)));
+		Schedule sndChild = new Schedule(env, diploid);
+		if (sndChild.isValid()) {
+			this.add(new Individual(sndChild, sndChild.getEvaluation()));
 		}
 		
 		++generation;
@@ -116,10 +112,9 @@ public class Population{
 			
 			// swap the old individual with the mutated individual
 			sl.remove(mutant); 
-			Schedule  s = new Schedule();
-			s = new Schedule(s, newChromesome);
-			if (hc.isSatisfied(s)) {
-				this.add(new Individual(s, s.getEvaluation(env)));
+			Schedule  s = new Schedule(env, newChromesome);
+			if (s.isValid()) {
+				this.add(new Individual(s, s.getEvaluation()));
 			}
 		}
 		
