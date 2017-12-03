@@ -81,14 +81,14 @@ public class Slot {
     }
 
     public Time getLabEndTime() {
-        return time.add(1, 0);
+        return time.add(0, 50);
     }
 
     public Time getLectureEndTime() {
         if (day == Day.TUESDAY) {
-            return time.add(1, 30);
+            return time.add(1, 15);
         } else {
-            return time.add(1, 0);
+            return time.add(0, 50);
         }
     }
 
