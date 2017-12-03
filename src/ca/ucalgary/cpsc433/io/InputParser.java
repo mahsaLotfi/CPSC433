@@ -93,7 +93,7 @@ public class InputParser {
                         this.name = parseName(buffer);
                         break;
                     case "Course slots:":
-                        final Slot lectureSlot = parseSlot(buffer);
+                        final Slot lectureSlot = parseSlot(buffer, true);
                         if (lectureSlot.isValidLectureSlot()) {
                             lectureSlots.add(lectureSlot);
                         } else {
@@ -101,7 +101,7 @@ public class InputParser {
                         }
                         break;
                     case "Lab slots:":
-                        final Slot labSlot = parseSlot(buffer);
+                        final Slot labSlot = parseSlot(buffer, false);
                         if (labSlot.isValidLabSlot()) {
                             labSlots.add(labSlot);
                         } else {
@@ -116,7 +116,7 @@ public class InputParser {
                     case "Labs:":
                         final Lab lab = parseLab(buffer);
                         final List<Lab> assigns = labAssignments.get(lab.getLecture());
-                        if(assigns == null) {
+                        if (assigns == null) {
                             throw new AssertionError("Expected a lecture assignment list to exist before lab parsing.");
                         }
                         assigns.add(lab);
@@ -174,7 +174,7 @@ public class InputParser {
         return line.nextIdentifier();
     }
 
-    private Slot parseSlot(final CharBuffer line) {
+    private Slot parseSlot(final CharBuffer line, final boolean lecture) {
         final Day day = parseDay(line);
         line.skipComma();
 
@@ -186,7 +186,15 @@ public class InputParser {
 
         final int min = line.nextInt();
 
-        return new Slot(day, time, max, min);
+        final Slot slot = Slot.getSlot(day, time);
+
+        if (lecture) {
+            slot.setLectureLimit(min, max);
+        } else {
+            slot.setLabLimit(min, max);
+        }
+
+        return slot;
     }
 
     private Course parseCourse(final CharBuffer line) {
@@ -275,7 +283,7 @@ public class InputParser {
         line.skipComma();
         final Time time = parseTime(line);
 
-        return new Unwanted(new Assign(course, new Slot(day, time)));
+        return new Unwanted(Assign.getAssign(course, Slot.getSlot(day, time)));
     }
 
     private Preference parsePreference(final CharBuffer line) {
@@ -287,7 +295,7 @@ public class InputParser {
         line.skipComma();
         final int value = line.nextInt();
 
-        return new Preference(new Assign(course, new Slot(day, time)), value);
+        return new Preference(Assign.getAssign(course, Slot.getSlot(day, time)), value);
     }
 
     private Pair parsePair(final CharBuffer line) {
@@ -305,7 +313,7 @@ public class InputParser {
         line.skipComma();
         final Time time = parseTime(line);
 
-        return new PartialAssign(new Assign(course, new Slot(day, time)));
+        return new PartialAssign(Assign.getAssign(course, Slot.getSlot(day, time)));
     }
 
     private Time parseTime(final CharBuffer line) {

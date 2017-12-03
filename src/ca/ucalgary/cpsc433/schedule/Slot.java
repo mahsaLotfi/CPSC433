@@ -1,27 +1,75 @@
 package ca.ucalgary.cpsc433.schedule;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * @author Obicere
  */
 public class Slot {
 
+    private static final Map<Integer, Slot> CACHE = new ConcurrentHashMap<>();
+
+    private static int slotCount = 0;
+
+    private int slotID;
+
     private final Day day;
 
     private final Time time;
 
-    private final int max;
+    private int lectureMax;
 
-    private final int min;
+    private int lectureMin;
 
-    public Slot(final Day day, final Time time) {
-        this(day, time, 0, 0);
+    private int labMax;
+
+    private int labMin;
+
+    private boolean lectureInit = false;
+
+    private boolean labInit = false;
+
+    public static Slot getSlot(final Day day, final Time time) {
+        final int id = getCacheID(day, time);
+        final Slot cached = CACHE.get(id);
+        if (cached != null) {
+            return cached;
+        }
+        final Slot newSLot = new Slot(day, time);
+        return newSLot;
     }
 
-    public Slot(final Day day, final Time time, final int max, final int min) {
+    public static boolean exists(final Day day, final Time time) {
+        final int id = getCacheID(day, time);
+        final Slot cached = CACHE.get(id);
+        return cached != null;
+    }
+
+    public static int getSlotCount() {
+        return slotCount;
+    }
+
+    public static Slot[] getSlots() {
+        final Slot[] slots = new Slot[slotCount];
+        for(int i = 0; i < slotCount; i++) {
+            slots[i] = CACHE.get(i);
+        }
+        return slots;
+    }
+
+    private static int getCacheID(final Day day, final Time time) {
+        return day.ordinal() * 2400 + time.getHour() * 60 + time.getMinute();
+    }
+
+    private Slot(final Day day, final Time time) {
         this.day = day;
         this.time = time;
-        this.max = max;
-        this.min = min;
+        this.slotID = slotCount++;
+    }
+
+    public int getSlotID() {
+        return slotID;
     }
 
     public Day getDay() {
@@ -37,19 +85,45 @@ public class Slot {
     }
 
     public Time getLectureEndTime() {
-        if(day == Day.TUESDAY) {
+        if (day == Day.TUESDAY) {
             return time.add(1, 30);
         } else {
             return time.add(1, 0);
         }
     }
 
-    public int getMax() {
-        return max;
+    public int getLectureMax() {
+        return lectureMax;
     }
 
-    public int getMin() {
-        return min;
+    public int getLectureMin() {
+        return lectureMin;
+    }
+
+    public void setLectureLimit(final int min, final int max) {
+        if (lectureInit) {
+            return;
+        }
+        this.lectureMax = max;
+        this.lectureMin = min;
+        this.lectureInit = true;
+    }
+
+    public void setLabLimit(final int min, final int max) {
+        if (labInit) {
+            return;
+        }
+        this.labMax = max;
+        this.labMin = min;
+        this.labInit = true;
+    }
+
+    public int getLabMax() {
+        return labMax;
+    }
+
+    public int getLabMin() {
+        return labMin;
     }
 
     public boolean isValidLectureSlot() {
@@ -58,26 +132,6 @@ public class Slot {
 
     public boolean isValidLabSlot() {
         return time.isValidLabTime(day);
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 * day.hashCode() + time.hashCode();
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null) {
-            return false;
-        }
-        if (!(o instanceof Slot)) {
-            return false;
-        }
-        final Slot other = (Slot) o;
-        return getDay().equals(other.getDay()) && getTime().equals(other.getTime());
     }
 
     @Override

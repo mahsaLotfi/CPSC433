@@ -3,10 +3,15 @@ package ca.ucalgary.cpsc433.schedule;
 import ca.ucalgary.cpsc433.environment.Course;
 import ca.ucalgary.cpsc433.environment.Lecture;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * @author Obicere
  */
 public class Assign {
+
+    private static final Map<String, Assign> CACHE = new ConcurrentHashMap<>();
 
     private final Course course;
 
@@ -14,7 +19,22 @@ public class Assign {
 
     private Time endTime;
 
-    public Assign(final Course course, final Slot slot) {
+    public static Assign getAssign(final Course course, final Slot slot) {
+        final String id = getCacheID(course, slot);
+        final Assign cached = CACHE.get(id);
+        if (cached != null) {
+            return cached;
+        }
+        final Assign newAssign = new Assign(course, slot);
+        CACHE.put(id, newAssign);
+        return newAssign;
+    }
+
+    private static String getCacheID(final Course course, final Slot slot) {
+        return course.toString() + slot.getSlotID();
+    }
+
+    private Assign(final Course course, final Slot slot) {
         if (course == null) {
             throw new NullPointerException("course must be non-null.");
         }

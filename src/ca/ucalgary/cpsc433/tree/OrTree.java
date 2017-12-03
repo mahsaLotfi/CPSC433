@@ -1,10 +1,9 @@
 package ca.ucalgary.cpsc433.tree;
 
+import ca.ucalgary.cpsc433.environment.Course;
 import ca.ucalgary.cpsc433.environment.Environment;
 import ca.ucalgary.cpsc433.environment.Lab;
 import ca.ucalgary.cpsc433.environment.Lecture;
-import ca.ucalgary.cpsc433.environment.NotCompatible;
-import ca.ucalgary.cpsc433.environment.Pair;
 import ca.ucalgary.cpsc433.environment.PartialAssign;
 import ca.ucalgary.cpsc433.schedule.Assign;
 import ca.ucalgary.cpsc433.schedule.Day;
@@ -41,7 +40,9 @@ public class OrTree {
 
     private State root;
 
-    private OrTree(final Environment environment) {
+    private Assign[] schedule;
+
+    public OrTree(final Environment environment) {
         this.environment = environment;
         this.lectureSlots = environment.getLectureSlots();
         this.labSlots = environment.getLabSlots();
@@ -49,24 +50,76 @@ public class OrTree {
         this.labs = environment.getLabs();
         this.partialAssign = environment.getPartialAssigns();
         this.random = new SecureRandom();
+
+        this.schedule = new Assign[lectures.length + labs.length];
     }
 
     public Schedule search() {
-
-    }
-
-    private void searchLecture() {
         final int badSlot = findTuesday1230Slot();
         final int n13Slot = findTuesday1800Slot();
 
         final int[] slot500 = new int[get500Count()];
         Arrays.fill(slot500, -1);
 
+        State current = new State(null, getSubtreeSize(0));
 
+        root = current;
+        depth++;
+
+        while (current != null) {
+            current.assign();
+
+            final Course course = getCourse(depth - 1);
+            final Slot slot = getSlot(depth - 1, current.current);
+
+            // System.out.println((depth - 1) + ": Assigning " + course + " to " + slot);
+            schedule[depth - 1] = Assign.getAssign(course, slot);
+
+            final Schedule build = build();
+            if (build.isValid()) {
+                if (isComplete()) {
+                    // System.out.println("Found valid solution");
+                    return build;
+                }
+            }
+            if (!build.isValid() || current.isComplete()) {
+                // System.out.println("Found invalid solution");
+                current = current.previous;
+                depth--;
+                current.mark();
+            }
+
+            final int subCount = getSubtreeSize(depth);
+            current = new State(current, subCount);
+
+            depth++;
+        }
+
+        return null;
     }
 
-    private void searchLab() {
+    private Course getCourse(final int i) {
+        if (i < lectures.length) {
+            return lectures[i];
+        } else {
+            return labs[i - lectures.length];
+        }
+    }
 
+    private int getSubtreeSize(final int i) {
+        if (i < lectures.length) {
+            return lectureSlots.length;
+        } else {
+            return labSlots.length;
+        }
+    }
+
+    private Slot getSlot(final int depth, final int i) {
+        if (depth < lectures.length) {
+            return lectureSlots[i];
+        } else {
+            return labSlots[i];
+        }
     }
 
     private boolean isComplete() {
@@ -74,23 +127,13 @@ public class OrTree {
     }
 
     private Schedule build() {
-        final Assign[] assigns = new Assign[lectures.length + labs.length];
-
-        State state = root;
-        for (int i = 0; i < lectures.length; i++) {
-            assigns[i] = new Assign(lectures[i], lectureSlots[state.current]);
-            state = state.next;
+        final Assign[] sub;
+        if (isComplete()) {
+            sub = schedule;
+        } else {
+            sub = Arrays.copyOf(schedule, depth);
         }
-
-        for (int i = 0; i < labs.length; i++) {
-            assigns[i + lectures.length] = new Assign(labs[i], labSlots[state.current]);
-            state = state.next;
-        }
-
-        if (state != null) {
-            throw new AssertionError("state must be null at this point.");
-        }
-        return new Schedule(environment, assigns);
+        return new Schedule(environment, sub);
     }
 
     private int get500Count() {
@@ -124,6 +167,7 @@ public class OrTree {
     }
 
     private int findSlot(final Slot slot, final Slot[] slots) {
+        // TODO could be cached
         for (int i = 0; i < slots.length; i++) {
             if (slot.equals(slots[i])) {
                 return i;
@@ -142,26 +186,33 @@ public class OrTree {
 
         private State next;
 
+        private State previous;
+
         private State(final State previous, final int subTreeCount) {
             this.subTrees = new boolean[subTreeCount];
             this.unchecked = subTreeCount;
 
+            this.previous = previous;
             if (previous != null) {
                 previous.next = this;
             }
+        }
+
+        State getPrevious() {
+            return previous;
         }
 
         State getNext() {
             return next;
         }
 
-        void mark(final int subTree) {
-            this.subTrees[subTree] = true;
+        void mark() {
+            this.subTrees[current] = true;
             unchecked--;
         }
 
         boolean isComplete() {
-            return unchecked == 0;
+            return (unchecked == 0);
         }
 
         int getCurrent() {
@@ -175,13 +226,12 @@ public class OrTree {
          *
          * @return the next unsolved subtree.
          */
-        int getNextAssign() {
+        void assign() {
             int next = (int) (subTrees.length * random.nextDouble());
             while (subTrees[next]) {
                 next = (next + 1) % subTrees.length;
             }
             this.current = next;
-            return next;
         }
 
     }

@@ -7,7 +7,6 @@ import ca.ucalgary.cpsc433.environment.Environment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Obicere
@@ -26,6 +25,10 @@ public class Schedule implements Cloneable, Comparable<Schedule> {
 
     private boolean validCached = false;
 
+    private int[] labCounts;
+
+    private int[] lectureCounts;
+
     public Schedule(final Environment environment) {
         this(environment, EMPTY_ASSIGNS);
     }
@@ -41,6 +44,8 @@ public class Schedule implements Cloneable, Comparable<Schedule> {
         ensureNonNull(assigns);
         this.environment = environment;
         this.assigns = assigns.clone();
+
+        buildCounts();
     }
 
     public Schedule(final Environment environment, final Schedule schedule, final Assign... newAssigns) {
@@ -57,6 +62,22 @@ public class Schedule implements Cloneable, Comparable<Schedule> {
 
         System.arraycopy(old, 0, assigns, 0, old.length);
         System.arraycopy(newAssigns, 0, assigns, old.length, newAssigns.length);
+
+        buildCounts();
+    }
+
+    private void buildCounts() {
+        labCounts = new int[environment.getSlotCount()];
+        lectureCounts = new int[environment.getSlotCount()];
+
+        for (final Assign assign : assigns) {
+            final Course course = assign.getCourse();
+            if (course.isLecture()) {
+                lectureCounts[assign.getSlot().getSlotID()]++;
+            } else {
+                labCounts[assign.getSlot().getSlotID()]++;
+            }
+        }
     }
 
     public Assign[] getAssigns() {
@@ -125,8 +146,16 @@ public class Schedule implements Cloneable, Comparable<Schedule> {
         return assigns.length;
     }
 
+    public int getLectureCount(final Slot slot) {
+        return lectureCounts[slot.getSlotID()];
+    }
+
+    public int getLabCount(final Slot slot) {
+        return labCounts[slot.getSlotID()];
+    }
+
     public Course[] getCourses(final Slot slot) {
-        final List<Course> courses = new ArrayList<>();
+        final ArrayList<Course> courses = new ArrayList<>();
         for (final Assign assign : assigns) {
             if (assign.getSlot().equals(slot)) {
                 courses.add(assign.getCourse());

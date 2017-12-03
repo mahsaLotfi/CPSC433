@@ -24,6 +24,8 @@ public class Environment {
 
     private final Slot[] lectureSlots;
 
+    private final Slot[] slots;
+
     private final Lab[] labs;
 
     private final Lecture[] lectures;
@@ -41,6 +43,8 @@ public class Environment {
     private final HardConstraint[] hardConstraints = HARD_CONSTRAINTS;
 
     private final SoftConstraint[] softConstraints = SOFT_CONSTRAINTS;
+
+    private final CourseDirectory directory;
 
     static {
         final List<HardConstraint> hard = new ArrayList<>();
@@ -64,6 +68,9 @@ public class Environment {
         this.preferences = preferences;
         this.pairs = pairs;
         this.partialAssigns = partialAssigns;
+
+        this.slots = Slot.getSlots();
+        this.directory = new CourseDirectory(this);
     }
 
     public String getName() {
@@ -74,12 +81,24 @@ public class Environment {
         return labSlots.clone();
     }
 
+    public int getLabSlotCount() {
+        return labSlots.length;
+    }
+
     public Slot[] getLectureSlots() {
         return lectureSlots.clone();
     }
 
-    public int getSlotCount() {
+    public int getLectureSlotCount() {
         return lectureSlots.length;
+    }
+
+    public Slot[] getSlots() {
+        return slots.clone();
+    }
+
+    public int getSlotCount() {
+        return slots.length;
     }
 
     public int getLabCount() {
@@ -124,5 +143,9 @@ public class Environment {
 
     public SoftConstraint[] getSoftConstraints() {
         return softConstraints.clone();
+    }
+
+    public CourseDirectory getDirectory() {
+        return directory;
     }
 }
