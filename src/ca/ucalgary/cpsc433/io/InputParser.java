@@ -126,16 +126,25 @@ public class InputParser {
                         notCompatibles.add(parseNotCompatible(buffer));
                         break;
                     case "Unwanted:":
-                        unwanted.add(parseUnwanted(buffer));
+                        final Unwanted unwanted = parseUnwanted(buffer);
+                        if (unwanted != null) {
+                            this.unwanted.add(unwanted);
+                        }
                         break;
                     case "Preferences:":
-                        preferences.add(parsePreference(buffer));
+                        final Preference preference = parsePreference(buffer);
+                        if (preference != null) {
+                            preferences.add(preference);
+                        }
                         break;
                     case "Pair:":
                         pairs.add(parsePair(buffer));
                         break;
                     case "Partial assignments:":
-                        partialAssigns.add(parsePartialAssign(buffer));
+                        final PartialAssign assign = parsePartialAssign(buffer);
+                        if (assign != null) {
+                            partialAssigns.add(assign);
+                        }
                         break;
                     default:
                         throw new AssertionError("Unexpected input: " + line);
@@ -283,6 +292,11 @@ public class InputParser {
         line.skipComma();
         final Time time = parseTime(line);
 
+        // no point caring about it, if the slot can't be assigned to
+        if (!Slot.exists(day, time)) {
+            return null;
+        }
+
         return new Unwanted(Assign.getAssign(course, Slot.getSlot(day, time)));
     }
 
@@ -294,6 +308,11 @@ public class InputParser {
         final Course course = parseCourse(line);
         line.skipComma();
         final int value = line.nextInt();
+
+        // no point caring about it, if the slot can't be assigned to
+        if (!Slot.exists(day, time)) {
+            return null;
+        }
 
         return new Preference(Assign.getAssign(course, Slot.getSlot(day, time)), value);
     }
@@ -312,6 +331,11 @@ public class InputParser {
         final Day day = parseDay(line);
         line.skipComma();
         final Time time = parseTime(line);
+
+        // no point caring about it, if the slot can't be assigned to
+        if (!Slot.exists(day, time)) {
+            return null;
+        }
 
         return new PartialAssign(Assign.getAssign(course, Slot.getSlot(day, time)));
     }

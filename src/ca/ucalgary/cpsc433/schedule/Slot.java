@@ -1,5 +1,6 @@
 package ca.ucalgary.cpsc433.schedule;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,8 +37,9 @@ public class Slot {
         if (cached != null) {
             return cached;
         }
-        final Slot newSLot = new Slot(day, time);
-        return newSLot;
+        final Slot newSlot = new Slot(day, time);
+        CACHE.put(id, newSlot);
+        return newSlot;
     }
 
     public static boolean exists(final Day day, final Time time) {
@@ -52,8 +54,9 @@ public class Slot {
 
     public static Slot[] getSlots() {
         final Slot[] slots = new Slot[slotCount];
-        for(int i = 0; i < slotCount; i++) {
-            slots[i] = CACHE.get(i);
+        final Collection<Slot> values = CACHE.values();
+        for (final Slot s : values) {
+            slots[s.getSlotID()] = s;
         }
         return slots;
     }
