@@ -50,6 +50,13 @@ public class Population{
 		return sl.get(0);
 	}
 	
+	/**
+	 * Crossover the fittest individual with another individual
+	 * randomly selected from the population at a cross point
+	 * randomly chosen, two child individuals will be created,
+	 * if the new individual is valid, it will be added to the
+	 * population
+	 */
 	public void crossover() {
 		if (sl.size()<2) {
 			return;
@@ -64,6 +71,8 @@ public class Population{
 		System.arraycopy(random.getRightHaploid(crossPoint), 0, diploid, crossPoint, sl.get(0).size()-crossPoint);
 		Schedule fstChild = new Schedule(env);
 		fstChild = new Schedule(env, diploid);
+		
+		// Add the first child if valid
 		if (fstChild.isValid()) {
 			this.add(new Individual(fstChild, fstChild.getEvaluation()));
 		}
@@ -73,6 +82,8 @@ public class Population{
 		System.arraycopy(random.getLeftHaploid(crossPoint), 0, diploid, 0, crossPoint);
 		System.arraycopy(fittest.getRightHaploid(crossPoint), 0, diploid, crossPoint, sl.get(0).size()-crossPoint);
 		Schedule sndChild = new Schedule(env, diploid);
+		
+		// Add the second child if valid
 		if (sndChild.isValid()) {
 			this.add(new Individual(sndChild, sndChild.getEvaluation()));
 		}
@@ -81,7 +92,9 @@ public class Population{
 	}
 	
 	/**
-	 * 
+	 * Mutate segment of a random (excluding the fittest) individual's 
+	 * chromosome to create a new individual, if the mutant is valid, 
+	 * it will replace the original individual
 	 * @param prob, chance that a mutation will occur in a generation
 	 * @param length the length of mutate string
 	 */
@@ -96,23 +109,23 @@ public class Population{
 			Individual mutant = sl.get(1+rand.nextInt(sl.size()-1)); // random individual except the fittest
 			int mutPoint = rand.nextInt(sl.get(0).size()-length);
 			Assign[] head = mutant.getSegment(0, mutPoint-length);
-			Assign[] endo = mutant.getSegment(mutPoint, length);
+			Assign[] endo = mutant.getSegment(mutPoint, length);     // segment to be mutated
 			Assign[] tail = mutant.getSegment(mutPoint+length, sl.get(0).size()-(mutPoint+length));
-			Assign[] newChromesome = new Assign[sl.get(0).size()];
+			Assign[] newchromosome = new Assign[sl.get(0).size()];
 			
 			Slot[] slotList = env.getLectureSlots();
             
 			for (int i=0; i<length;++i) {
-				endo[i] = new Assign(endo[i].getCourse(),slotList[rand.nextInt(slotList.length)]);
+				endo[i] = Assign.getAssign(endo[i].getCourse(), slotList[rand.nextInt(slotList.length)]);
 			}
 			
-			System.arraycopy(head, 0, newChromesome, 0, mutPoint-length);
-			System.arraycopy(endo, 0, newChromesome, mutPoint, length);
-			System.arraycopy(tail, 0, newChromesome, mutPoint+length,sl.get(0).size()-(mutPoint+length));
+			System.arraycopy(head, 0, newchromosome, 0, mutPoint-length);
+			System.arraycopy(endo, 0, newchromosome, mutPoint, length);
+			System.arraycopy(tail, 0, newchromosome, mutPoint+length,sl.get(0).size()-(mutPoint+length));
 			
 			// swap the old individual with the mutated individual
 			sl.remove(mutant); 
-			Schedule  s = new Schedule(env, newChromesome);
+			Schedule  s = new Schedule(env, newchromosome);
 			if (s.isValid()) {
 				this.add(new Individual(s, s.getEvaluation()));
 			}
