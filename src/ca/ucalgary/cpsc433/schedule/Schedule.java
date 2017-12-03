@@ -43,6 +43,22 @@ public class Schedule implements Cloneable, Comparable<Schedule> {
         this.assigns = assigns.clone();
     }
 
+    public Schedule(final Environment environment, final Schedule schedule, final Assign... newAssigns) {
+        if (environment == null) {
+            throw new NullPointerException("environment must be non-null");
+        }
+        if (newAssigns == null) {
+            throw new NullPointerException("assigns must be non-null.");
+        }
+        final Assign[] old = schedule.assigns;
+
+        this.environment = environment;
+        this.assigns = new Assign[old.length + newAssigns.length];
+
+        System.arraycopy(old, 0, assigns, 0, old.length);
+        System.arraycopy(newAssigns, 0, assigns, old.length, newAssigns.length);
+    }
+
     public Assign[] getAssigns() {
         // note the clone call here. O(n), don't use excessively.
         return assigns.clone();
