@@ -12,6 +12,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CourseDirectory {
 
+    private static final Course[]  EMPTY_COURSES  = new Course[0];
+    private static final Lecture[] EMPTY_LECTURES = new Lecture[0];
+    private static final Lab[]     EMPTY_LABS     = new Lab[0];
+
     private final Map<String, Course[]> idToCourses;
 
     private final Map<String, Lecture[]> idToLectures;
@@ -30,7 +34,7 @@ public class CourseDirectory {
             insert(courses, lecture);
             insert(lectures, lecture);
         }
-        for(final Lab lab : environment.getLabs()) {
+        for (final Lab lab : environment.getLabs()) {
             insert(courses, lab);
             insert(labs, lab);
         }
@@ -56,7 +60,7 @@ public class CourseDirectory {
     @SuppressWarnings("unchecked")
     private <T extends Course> Map<String, T[]> flatten(final Map<String, Set<T>> map, final Class<T> cls) {
         final Map<String, T[]> newMap = new ConcurrentHashMap<>();
-        for(final Map.Entry<String, Set<T>> entry : map.entrySet()) {
+        for (final Map.Entry<String, Set<T>> entry : map.entrySet()) {
             final Set<T> value = entry.getValue();
             final T[] array = (T[]) Array.newInstance(cls, value.size());
             newMap.put(entry.getKey(), value.toArray(array));
@@ -68,21 +72,33 @@ public class CourseDirectory {
         if (type == null) {
             throw new NullPointerException("type must be non-null");
         }
-        return idToCourses.get(getID(type, number)).clone();
+        final Course[] courses = idToCourses.get(getID(type, number));
+        if (courses == null) {
+            return EMPTY_COURSES;
+        }
+        return courses.clone();
     }
 
     public Lecture[] getLectures(final String type, final int number) {
         if (type == null) {
             throw new NullPointerException("type must be non-null");
         }
-        return idToLectures.get(getID(type, number)).clone();
+        final Lecture[] lectures = idToLectures.get(getID(type, number));
+        if (lectures == null) {
+            return EMPTY_LECTURES;
+        }
+        return lectures.clone();
     }
 
     public Lab[] getLabs(final String type, final int number) {
         if (type == null) {
             throw new NullPointerException("type must be non-null");
         }
-        return idToLabs.get(getID(type, number)).clone();
+        final Lab[] labs = idToLabs.get(getID(type, number));
+        if (labs == null) {
+            return EMPTY_LABS;
+        }
+        return labs.clone();
     }
 
     private String getID(final Course course) {

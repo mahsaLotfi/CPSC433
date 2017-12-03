@@ -15,9 +15,6 @@ import ca.ucalgary.cpsc433.schedule.Slot;
 import ca.ucalgary.cpsc433.tree.OrTree;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  * @author Obicere
@@ -85,11 +82,8 @@ public class Main {
         final Schedule schedule = schedules[0];
 
         System.out.println("Schedule for: " + environment.getName());
-        final Set<Slot> slotSet = new LinkedHashSet<>();
-        Collections.addAll(slotSet, environment.getLectureSlots());
-        Collections.addAll(slotSet, environment.getLabSlots());
 
-        final Slot[] slots = slotSet.toArray(new Slot[slotSet.size()]);
+        final Slot[] slots = environment.getSlots();
         for (final Slot slot : slots) {
             System.out.println(slot);
             final Course[] courses = schedule.getCourses(slot);

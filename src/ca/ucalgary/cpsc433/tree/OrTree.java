@@ -38,8 +38,6 @@ public class OrTree {
 
     private int depth = 0;
 
-    private State root;
-
     private Assign[] schedule;
 
     public OrTree(final Environment environment) {
@@ -63,7 +61,6 @@ public class OrTree {
 
         State current = new State(null, getSubtreeSize(0));
 
-        root = current;
         depth++;
 
         while (current != null) {
