@@ -76,8 +76,16 @@ public class Main {
             schedules[i] = tree.search();
             sum += (System.nanoTime() - start);
 
+            if(i % 10000 == 0) {
+                System.out.println(i);
+            }
         }
         System.out.printf("Average time per tree: %f\n", (sum / (double) length));
+
+        if(schedules[0] == null) {
+            System.out.println("No solution for schedule.");
+            return;
+        }
 
         final Schedule schedule = schedules[0];
 

@@ -6,24 +6,25 @@ import ca.ucalgary.cpsc433.environment.Course;
 import ca.ucalgary.cpsc433.environment.Environment;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * @author Obicere
  */
-public class Schedule implements Cloneable, Comparable<Schedule> {
+public class Schedule implements Comparable<Schedule> {
 
     private static final Assign[] EMPTY_ASSIGNS = new Assign[0];
 
-    private final Assign[] assigns;
-
     private final Environment environment;
+
+    private final int lectureCount;
 
     private int evaluation = -1;
 
     private boolean valid = false;
 
     private boolean validCached = false;
+
+    private byte[] assigns;
 
     private byte[] labCounts;
 
@@ -33,60 +34,72 @@ public class Schedule implements Cloneable, Comparable<Schedule> {
         this(environment, EMPTY_ASSIGNS);
     }
 
-    public Schedule(final Environment environment, final Schedule schedule) {
-        this(environment, schedule.assigns.clone());
-    }
-
     public Schedule(final Environment environment, final Assign[] assigns) {
         if (environment == null) {
             throw new NullPointerException("environment must be non-null");
         }
         ensureNonNull(assigns);
         this.environment = environment;
-        this.assigns = assigns.clone();
+        this.lectureCount = environment.getLectureCount();
 
-        buildCounts();
+        buildSlots(assigns);
     }
 
-    public Schedule(final Environment environment, final Schedule schedule, final Assign... newAssigns) {
-        if (environment == null) {
-            throw new NullPointerException("environment must be non-null");
-        }
-        if (newAssigns == null) {
-            throw new NullPointerException("assigns must be non-null.");
-        }
-        final Assign[] old = schedule.assigns;
-
-        this.environment = environment;
-        this.assigns = new Assign[old.length + newAssigns.length];
-
-        System.arraycopy(old, 0, assigns, 0, old.length);
-        System.arraycopy(newAssigns, 0, assigns, old.length, newAssigns.length);
-
-        buildCounts();
-    }
-
-    private void buildCounts() {
+    private void buildSlots(final Assign[] original) {
+        assigns = new byte[original.length];
         labCounts = new byte[environment.getSlotCount()];
         lectureCounts = new byte[environment.getSlotCount()];
 
-        for (final Assign assign : assigns) {
+        for (final Assign assign : original) {
             final Course course = assign.getCourse();
+            final Slot slot = assign.getSlot();
+            final int slotID = slot.getSlotID();
+
+            assigns[course.getID()] = (byte) slotID;
+
             if (course.isLecture()) {
-                lectureCounts[assign.getSlot().getSlotID()]++;
+                lectureCounts[slotID]++;
             } else {
-                labCounts[assign.getSlot().getSlotID()]++;
+                labCounts[slotID]++;
             }
         }
     }
 
     public Assign[] getAssigns() {
-        // note the clone call here. O(n), don't use excessively.
-        return assigns.clone();
+        return getAssigns(0, assigns.length);
     }
 
     public Assign[] getAssigns(final int start, final int length) {
-        return Arrays.copyOfRange(assigns, start, length);
+        final Assign[] newAssigns = new Assign[length];
+        for (int i = 0; i < length; i++) {
+            newAssigns[i + start] = getAssign(i);
+        }
+        return newAssigns;
+    }
+
+    public Assign getAssign(final Course course) {
+        final Slot slot;
+        if (course.isLecture()) {
+            slot = environment.getSlot(course.getID());
+        } else {
+            slot = environment.getSlot(course.getID() + lectureCount);
+        }
+        return Assign.getAssign(course, slot);
+    }
+
+    public Assign getAssign(final int courseID) {
+        final Course course = getCourse(courseID);
+        return getAssign(course);
+    }
+
+    private Course getCourse(final int courseID) {
+        final Course course;
+        if (courseID < lectureCount) {
+            course = environment.getLecture(courseID);
+        } else {
+            course = environment.getLab(courseID - lectureCount);
+        }
+        return course;
     }
 
     public int getEvaluation() {
@@ -156,9 +169,11 @@ public class Schedule implements Cloneable, Comparable<Schedule> {
 
     public Course[] getCourses(final Slot slot) {
         final ArrayList<Course> courses = new ArrayList<>();
-        for (final Assign assign : assigns) {
-            if (assign.getSlot().equals(slot)) {
-                courses.add(assign.getCourse());
+        for (int i = 0; i < assigns.length; i++) {
+            final int assign = assigns[i];
+            if (assign == slot.getSlotID()) {
+                final Course course = getCourse(i);
+                courses.add(course);
             }
         }
         return courses.toArray(new Course[courses.size()]);
@@ -167,15 +182,5 @@ public class Schedule implements Cloneable, Comparable<Schedule> {
     @Override
     public int compareTo(final Schedule o) {
         return Integer.compare(getEvaluation(), o.getEvaluation());
-    }
-
-    @Override
-    public Schedule clone() {
-        try {
-            super.clone();
-        } catch (final CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
-        return new Schedule(environment, this);
     }
 }

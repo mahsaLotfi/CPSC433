@@ -1,26 +1,77 @@
 package ca.ucalgary.cpsc433.environment;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * @author Obicere
  */
 public class Lab implements Course {
 
-    private final Lecture lecture;
+    private static final Map<String, Lab> CACHE = new ConcurrentHashMap<>();
+
+    private static int labCount = 0;
+
+    private final int labID;
+
+    private final Lecture[] lecture;
 
     private final boolean isLab;
 
     private final int section;
 
-    public Lab(final Lecture lecture, final boolean isLab, final int section) {
+    private final String type;
+
+    private final int number;
+
+    public static Lab getLab(final Lecture[] lecture, final boolean isLab, final int section) {
+        final String id = getCacheID(lecture[0].getType(), lecture[0].getNumber(), section);
+        final Lab cached = CACHE.get(id);
+        if (cached != null) {
+            return cached;
+        }
+        final Lab newLab = new Lab(lecture, isLab, section);
+        CACHE.put(id, newLab);
+        return newLab;
+    }
+
+    public static int getLabCount() {
+        return labCount;
+    }
+
+    public static Lab[] getLabs() {
+        final Lab[] labs = new Lab[labCount];
+        final Collection<Lab> values = CACHE.values();
+        for (final Lab l : values) {
+            labs[l.getID()] = l;
+        }
+        return labs;
+    }
+
+    private static String getCacheID(final String type, final int number, final int section) {
+        return type + number + section;
+    }
+
+    Lab(final Lecture[] lecture, final boolean isLab, final int section) {
         if (lecture == null) {
             throw new NullPointerException("lecture must be non-null");
         }
+        this.type = lecture[0].getType();
+        this.number = lecture[0].getNumber();
         this.lecture = lecture;
         this.isLab = isLab;
         this.section = section;
+
+        this.labID = labCount++;
     }
 
-    public Lecture getLecture() {
+    @Override
+    public int getID() {
+        return labID;
+    }
+
+    public Lecture[] getLectures() {
         return lecture;
     }
 
@@ -30,12 +81,12 @@ public class Lab implements Course {
 
     @Override
     public int getNumber() {
-        return lecture.getNumber();
+        return lecture[0].getNumber();
     }
 
     @Override
     public String getType() {
-        return lecture.getType();
+        return lecture[0].getType();
     }
 
     @Override
@@ -54,17 +105,22 @@ public class Lab implements Course {
             return 1;
         }
         final Lab other = (Lab) o;
-        final int lectureCompare = getLecture().compareTo(other.getLecture());
-        if (lectureCompare != 0) {
-            return lectureCompare;
+        final int numberCmp = Integer.compare(getNumber(), other.getNumber());
+        if (numberCmp != 0) {
+            return numberCmp;
         }
-        return Integer.compare(getSection(), o.getSection());
+        final int sectionCmp = Integer.compare(getSection(), other.getSection());
+        if (sectionCmp != 0) {
+            return sectionCmp;
+        }
+        return getType().compareTo(other.getType());
     }
 
     @Override
     public int hashCode() {
         int h = 27;
-        h = 31 * h + lecture.hashCode();
+        h = 31 * h + type.hashCode();
+        h = 31 * h + number;
         h = 31 * h + section;
         return h;
     }
@@ -81,14 +137,22 @@ public class Lab implements Course {
             return false;
         }
         final Lab other = (Lab) o;
-        return getLecture().equals(other.getLecture()) && getSection() == other.getSection();
+        return getNumber() == other.getNumber() && getSection() == other.getSection() && getType().equals(other.getType());
     }
 
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append(lecture.toString());
-        builder.append(' ');
+        if (lecture.length != 1) {
+            builder.append(type);
+            builder.append(' ');
+            builder.append(number);
+            builder.append(' ');
+        } else {
+            final Lecture lecture = this.lecture[0];
+            builder.append(lecture);
+            builder.append(' ');
+        }
         builder.append(isLab ? "LAB" : "TUT");
         builder.append(' ');
         builder.append(section < 10 ? "0" : "");

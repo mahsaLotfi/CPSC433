@@ -57,12 +57,10 @@ public class Environment {
         SOFT_CONSTRAINTS = soft.toArray(new SoftConstraint[soft.size()]);
     }
 
-    public Environment(final String name, final Slot[] lectureSlots, final Slot[] labSlots, final Lecture[] lectures, final Lab[] labs, final NotCompatible[] notCompatibles, final Unwanted[] unwanted, final Preference[] preferences, final Pair[] pairs, final PartialAssign[] partialAssigns) {
+    public Environment(final String name, final Slot[] lectureSlots, final Slot[] labSlots, final NotCompatible[] notCompatibles, final Unwanted[] unwanted, final Preference[] preferences, final Pair[] pairs, final PartialAssign[] partialAssigns) {
         this.name = name;
         this.lectureSlots = lectureSlots;
         this.labSlots = labSlots;
-        this.labs = labs;
-        this.lectures = lectures;
         this.notCompatibles = notCompatibles;
         this.unwanted = unwanted;
         this.preferences = preferences;
@@ -70,6 +68,8 @@ public class Environment {
         this.partialAssigns = partialAssigns;
 
         this.slots = Slot.getSlots();
+        this.lectures = Lecture.getLectures();
+        this.labs = Lab.getLabs();
         this.directory = new CourseDirectory(this);
     }
 
@@ -97,6 +97,10 @@ public class Environment {
         return slots.clone();
     }
 
+    public Slot getSlot(final int id) {
+        return slots[id];
+    }
+
     public int getSlotCount() {
         return slots.length;
     }
@@ -109,6 +113,10 @@ public class Environment {
         return labs.clone();
     }
 
+    public Lab getLab(final int id) {
+        return labs[id];
+    }
+
     public int getLectureCount() {
         return lectures.length;
     }
@@ -117,24 +125,53 @@ public class Environment {
         return lectures.clone();
     }
 
+    public Lecture getLecture(final int id) {
+        return lectures[id];
+    }
+
+    @Deprecated
     public NotCompatible[] getNotCompatibles() {
         return notCompatibles.clone();
     }
 
+    @Deprecated
     public Unwanted[] getUnwanted() {
         return unwanted.clone();
     }
 
+    @Deprecated
     public Preference[] getPreferences() {
         return preferences.clone();
     }
 
+    @Deprecated
     public Pair[] getPairs() {
         return pairs.clone();
     }
 
+    @Deprecated
     public PartialAssign[] getPartialAssigns() {
         return partialAssigns.clone();
+    }
+
+    public Course[] getNonCompatibles(final Course course) {
+        // TODO
+        return null;
+    }
+
+    public Preference[] getPreferences(final Course course) {
+        // TODO
+        return null;
+    }
+
+    public Course[] getPairs(final Course course) {
+        // TODO
+        return null;
+    }
+
+    public PartialAssign getPartialAssign(final Course course) {
+        // TODO
+        return null;
     }
 
     public HardConstraint[] getHardConstraints() {

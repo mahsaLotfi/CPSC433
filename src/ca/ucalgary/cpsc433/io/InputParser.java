@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -115,11 +116,14 @@ public class InputParser {
                         break;
                     case "Labs:":
                         final Lab lab = parseLab(buffer);
-                        final List<Lab> assigns = labAssignments.get(lab.getLecture());
-                        if (assigns == null) {
-                            throw new AssertionError("Expected a lecture assignment list to exist before lab parsing.");
+                        final Lecture[] lectures = lab.getLectures();
+                        for (final Lecture labLecture : lectures) {
+                            final List<Lab> assigns = labAssignments.get(labLecture);
+                            if (assigns == null) {
+                                throw new AssertionError("Expected a lecture assignment list to exist before lab parsing.");
+                            }
+                            assigns.add(lab);
                         }
-                        assigns.add(lab);
                         labs.add(lab);
                         break;
                     case "Not compatible:":
@@ -168,15 +172,13 @@ public class InputParser {
     private Environment getEnvironment() {
         final Slot[] newLectureSlots = lectureSlots.toArray(new Slot[lectureSlots.size()]);
         final Slot[] newLabSlots = labSlots.toArray(new Slot[labSlots.size()]);
-        final Lecture[] newLectures = lectures.toArray(new Lecture[lectures.size()]);
-        final Lab[] newLabs = labs.toArray(new Lab[labs.size()]);
         final NotCompatible[] newNotCompatibles = notCompatibles.toArray(new NotCompatible[notCompatibles.size()]);
         final Unwanted[] newUnwanted = unwanted.toArray(new Unwanted[unwanted.size()]);
         final Preference[] newPreferences = preferences.toArray(new Preference[preferences.size()]);
         final Pair[] newPairs = pairs.toArray(new Pair[pairs.size()]);
         final PartialAssign[] newPartialAssigns = partialAssigns.toArray(new PartialAssign[partialAssigns.size()]);
 
-        return new Environment(name, newLectureSlots, newLabSlots, newLectures, newLabs, newNotCompatibles, newUnwanted, newPreferences, newPairs, newPartialAssigns);
+        return new Environment(name, newLectureSlots, newLabSlots, newNotCompatibles, newUnwanted, newPreferences, newPairs, newPartialAssigns);
     }
 
     private String parseName(final CharBuffer line) {
@@ -220,20 +222,25 @@ public class InputParser {
         if (type.equals("LEC")) {
             lectureSection = line.nextInt();
         } else if (type.equals("TUT") || type.equals("LAB")) {
-            lectureSection = 1;
+            lectureSection = -1;
         } else {
             throw new IllegalArgumentException("Failed to parse course type: " + type);
         }
         line.skipSpaces();
 
-        final Lecture newLecture = new Lecture(course, number, lectureSection);
-        final Lecture existing;
-        final int index = lectures.indexOf(newLecture);
-        if (index >= 0) {
-            existing = lectures.get(index);
+        final List<Lecture> lectures = getLectures(course, number, lectureSection);
+        final Lecture[] lecture;
+        if (!lectures.isEmpty()) {
+            lecture = lectures.toArray(new Lecture[lectures.size()]);
         } else {
-            existing = newLecture;
+            if (lectureSection == -1) {
+                throw new AssertionError("could not have reached ambiguous lecture before lecture initialized");
+            }
+            lecture = new Lecture[]{
+                    Lecture.getLecture(course, number, lectureSection)
+            };
         }
+
         if (line.hasNext() && line.peek() != ',') {
             final String labType;
             if (type.equals("LAB") || type.equals("TUT")) {
@@ -255,7 +262,7 @@ public class InputParser {
             final int labSection = line.nextInt();
             line.skipSpaces();
 
-            final Lab lab = new Lab(existing, isLab, labSection);
+            final Lab lab = Lab.getLab(lecture, isLab, labSection);
             final Lab existingLab;
             final int labIndex = labs.indexOf(lab);
             if (labIndex >= 0) {
@@ -265,7 +272,10 @@ public class InputParser {
             }
             return existingLab;
         } else {
-            return existing;
+            if (lecture.length > 1) {
+                throw new AssertionError("should not have reached here if only 1 lecture");
+            }
+            return lecture[0];
         }
     }
 
@@ -362,6 +372,18 @@ public class InputParser {
             default:
                 throw new AssertionError("Unknown day identifier: " + day);
         }
+    }
+
+    private List<Lecture> getLectures(final String type, final int number, final int section) {
+        final List<Lecture> lectures = new ArrayList<>();
+        for (final Lecture lecture : this.lectures) {
+            if (lecture.getType().equals(type) && lecture.getNumber() == number) {
+                if (section == -1 || section == lecture.getSection()) {
+                    lectures.add(lecture);
+                }
+            }
+        }
+        return lectures;
     }
 
     private static class CharBuffer {
