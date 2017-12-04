@@ -36,7 +36,7 @@ public class Main {
 
         boolean solutionFound = true;
         long sum = 0;
-        int length = 10000;
+        int length = 1;
         final Schedule[] schedules = new Schedule[length];
         for (int i = 0; i < length; i++) {
             final OrTree tree = new OrTree(environment);
@@ -55,7 +55,7 @@ public class Main {
         if (solutionFound) {
             System.out.printf("Average time per tree: %f\n", (sum / (double) length));
 
-            final Schedule schedule = schedules[0];
+            final Schedule schedule = schedules[(int) (Math.random() * schedules.length)];
 
             System.out.println("Schedule for: " + environment.getName());
 

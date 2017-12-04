@@ -10,8 +10,8 @@ import ca.ucalgary.cpsc433.schedule.Slot;
 import ca.ucalgary.cpsc433.schedule.Time;
 
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * @author Obicere
@@ -36,18 +36,17 @@ public class CPSC913Constraint implements HardConstraint {
         }
 
         final Assign[] assigns = new Assign[nonCompatibles.length];
-        for(int i = 0; i < assigns.length; i++){
+        for (int i = 0; i < assigns.length; i++) {
             assigns[i] = schedule.getAssign(nonCompatibles[i]);
         }
         for (final Lecture lecture : cpsc913) {
             final Assign assign = schedule.getAssign(lecture);
             final Slot assigned = assign.getSlot();
-            if(!assigned.equals(target)) {
+            if (!assigned.equals(target)) {
                 return false;
             }
             for (int i = 0; i < nonCompatibles.length; i++) {
-                final Course other = nonCompatibles[i];
-                if(other != null && assigns[i].collides(assign)) {
+                if (assigns[i] != null && assigns[i].collides(assign)) {
                     return false;
                 }
             }
@@ -71,7 +70,7 @@ public class CPSC913Constraint implements HardConstraint {
         }
         this.cpsc913 = lectures;
 
-        final List<Course> courses = new LinkedList<>();
+        final Set<Course> courses = new LinkedHashSet<>();
 
         final Course[] cpsc413 = environment.getCourses("CPSC", 413);
         Collections.addAll(courses, cpsc413);

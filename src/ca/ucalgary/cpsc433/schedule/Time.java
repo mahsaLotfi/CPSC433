@@ -105,6 +105,7 @@ public class Time implements Comparable<Time> {
                 case 1400:
                 case 1530:
                 case 1700:
+                case 1800:
                 case 1830:
                     return true;
                 default:

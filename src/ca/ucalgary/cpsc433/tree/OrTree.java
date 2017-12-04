@@ -57,9 +57,33 @@ public class OrTree {
 
         State current = new State(null, getSubtreeSize(0));
 
-        depth++;
+        while (current != null) {
+            while (!current.isComplete()) {
+                current.assign();
 
-        while (true) {
+                final Course course = getCourse(depth);
+                final Slot slot = getSlot(depth, current.current);
+
+                // System.out.println(depth + ": Assigning " + course + " to " + slot);
+                schedule[depth] = Assign.getAssign(course, slot);
+                depth++;
+
+                Schedule build = build();
+                if (build.isValid()) {
+                    if (isComplete()) {
+                        // System.out.println("Found valid solution");
+                        return build;
+                    } else {
+                        current = new State(current, getSubtreeSize(depth));
+                    }
+                } else {
+                    depth--;
+                    current.mark();
+                }
+            }
+            // System.out.println("Going back");
+            current = goBack(current);
+            /*
             current.assign();
 
             final Course course = getCourse(depth - 1);
@@ -75,14 +99,17 @@ public class OrTree {
                     return build;
                 }
             }
-            if (!build.isValid() || current.isComplete()) {
+            if (!build().isValid()) {
+                current = goBack(current);
+                if (current == null) {
+                    return null;
+                }
+            }
+            if (current.isComplete()) {
                 // System.out.println("Found invalid solution");
                 do {
-                    current = current.previous;
-                    depth--;
-                    if (current != null) {
-                        current.mark();
-                    } else {
+                    current = goBack(current);
+                    if (current == null) {
                         return null;
                     }
                 } while (current.isComplete());
@@ -92,6 +119,19 @@ public class OrTree {
             current = new State(current, subCount);
 
             depth++;
+            */
+        }
+        return null;
+    }
+
+    private State goBack(State current) {
+        current = current.previous;
+        depth--;
+        if (current != null) {
+            current.mark();
+            return current;
+        } else {
+            return null;
         }
     }
 
