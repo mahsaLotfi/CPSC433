@@ -3,8 +3,7 @@ package ca.ucalgary.cpsc433.environment;
 import ca.ucalgary.cpsc433.constraint.hard.CPSC813Constraint;
 import ca.ucalgary.cpsc433.constraint.hard.CPSC913Constraint;
 import ca.ucalgary.cpsc433.constraint.hard.HardConstraint;
-import ca.ucalgary.cpsc433.constraint.hard.LabMaxConstraint;
-import ca.ucalgary.cpsc433.constraint.hard.LectureMaxConstraint;
+import ca.ucalgary.cpsc433.constraint.hard.MaxConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.TuesdayElevenConstraint;
 import ca.ucalgary.cpsc433.constraint.soft.SoftConstraint;
 import ca.ucalgary.cpsc433.schedule.Slot;
@@ -70,8 +69,7 @@ public class Environment {
 
     static {
         final List<HardConstraint> hard = new ArrayList<>();
-        hard.add(new LectureMaxConstraint());
-        hard.add(new LabMaxConstraint());
+        hard.add(new MaxConstraint());
 
         hard.add(new TuesdayElevenConstraint());
         hard.add(new CPSC813Constraint());

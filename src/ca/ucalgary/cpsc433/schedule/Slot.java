@@ -19,13 +19,13 @@ public class Slot {
 
     private final Time time;
 
-    private int lectureMax;
+    private int lectureMax = 0;
 
-    private int lectureMin;
+    private int lectureMin = 0;
 
-    private int labMax;
+    private int labMax = 0;
 
-    private int labMin;
+    private int labMin = 0;
 
     private boolean lectureInit = false;
 

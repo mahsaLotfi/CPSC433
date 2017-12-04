@@ -61,7 +61,7 @@ public class Main {
 
             final Slot[] slots = environment.getSlots();
             for (final Slot slot : slots) {
-                System.out.println(slot);
+                System.out.println(slot + ", " + slot.getLectureMax() + ", " + slot.getLabMax());
                 final Course[] courses = schedule.getCourses(slot);
 
                 for (final Course course : courses) {
