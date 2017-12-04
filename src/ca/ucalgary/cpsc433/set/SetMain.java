@@ -48,9 +48,18 @@ public class SetMain {
         }
 
         if (solutionFound) {
-            Population culture = new Population(10, environment);
+            Population culture = new Population(1000, environment);
             for (Schedule s : schedules) {
                 culture.add(new Individual(s, s.getEvaluation()));
+            }
+            
+            int gens = 1000;
+            while (culture.getGeneration()<gens) {   
+                if (Thread.interrupted()) {                                 
+                    break;                                                  
+                }
+                //culture.mutate(10, environment.getCourseCount()/10);
+                culture.crossover();
             }
 
             System.out.println("Final fitness:" + culture.getFittest().getFitness());
