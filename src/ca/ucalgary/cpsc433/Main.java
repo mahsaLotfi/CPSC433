@@ -2,12 +2,15 @@ package ca.ucalgary.cpsc433;
 
 import ca.ucalgary.cpsc433.environment.Course;
 import ca.ucalgary.cpsc433.environment.Environment;
-import ca.ucalgary.cpsc433.environment.Lab;
-import ca.ucalgary.cpsc433.environment.Lecture;
 import ca.ucalgary.cpsc433.io.InputParser;
 import ca.ucalgary.cpsc433.schedule.Schedule;
 import ca.ucalgary.cpsc433.schedule.Slot;
-import ca.ucalgary.cpsc433.tree.OrTree;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Obicere
@@ -18,73 +21,84 @@ public class Main {
             System.err.println("Need to run main with input file as first parameter.");
             return;
         }
+
+        try {
+            final FileInputStream stream = new FileInputStream("resources/config.properties");
+
+            final Properties properties = new Properties(System.getProperties());
+
+            properties.load(stream);
+
+            System.setProperties(properties);
+        } catch (final IOException e) {
+            System.err.println("Failed to load properties file.");
+        }
+
         final Environment environment;
         try {
             environment = InputParser.parseEnvironment(args[0]);
         } catch (final Exception e) {
-            e.printStackTrace();
+            System.err.println("Failed to load environment: " + e.getMessage());
             return;
         }
-        for (final Lecture lecture : environment.getLectures()) {
-            System.out.println(lecture);
-            for (final Lab lab : lecture.getLabs()) {
-                System.out.print('\t');
-                System.out.println(lab);
+
+        final int timeout = getProperty("timeout", 15);
+        final long timeoutms = TimeUnit.MILLISECONDS.convert(timeout, TimeUnit.MINUTES);
+
+        final Solver solver = new Solver(environment);
+
+        final Thread thread = new Thread(solver);
+
+        final long start = System.currentTimeMillis();
+        thread.start();
+
+        try {
+            if (timeoutms > 0) {
+                Thread.sleep(timeoutms);
+                thread.interrupt();
             }
-            System.out.println();
+            thread.join();
+        } catch (final InterruptedException e) {
+            System.err.println("Main thread interrupted. Terminating abruptly.");
+            return;
         }
 
-        boolean solutionFound = true;
-        long sum = 0;
-        long evaluation = 0;
-        int minEval = Integer.MAX_VALUE;
-        int maxEval = Integer.MIN_VALUE;
-        int length = 100;
-        final Schedule[] schedules = new Schedule[length];
-        for (int i = 0; i < length; i++) {
-            final OrTree tree = new OrTree(environment);
+        final long end = System.currentTimeMillis() - start;
+        final long minutes = end / 60000;
+        final long seconds = (end % 60000) / 1000;
+        final long milliseconds = (end % 1000);
 
-            final long start = System.nanoTime();
-            schedules[i] = tree.search();
+        System.out.printf("Done in %d:%02d:%03d%n%n", minutes, seconds, milliseconds);
 
-            if (schedules[i] == null) {
-                System.out.println("No solution for schedule.");
-                solutionFound = false;
-                break;
-            }
+        final Schedule solution = solver.getSolution();
 
-            sum += (System.nanoTime() - start);
-            final int eval = schedules[i].getEvaluation();
+        System.out.println("Evaluation: " + solution.getEvaluation());
 
-            evaluation += eval;
-            if (eval > maxEval) {
-                maxEval = eval;
-            }
-            if (eval < minEval) {
-                minEval = eval;
-            }
-        }
+        final Slot[] slots = environment.getSlots();
+        Arrays.sort(slots);
 
-        if (solutionFound) {
-            System.out.printf("Average time per tree: %f\n", (sum / (double) length));
-            System.out.printf("Average evaluation: %f, Min: %d, Max: %d\n", (evaluation / (double) length), minEval, maxEval);
+        for (final Slot slot : slots) {
+            final Course[] courses = solution.getCourses(slot);
 
-            final Schedule schedule = schedules[(int) (Math.random() * schedules.length)];
-
-            System.out.println();
-            System.out.println("Evaluation: " + schedule.getEvaluation());
-            System.out.println("Schedule for: " + environment.getName());
-
-            final Slot[] slots = environment.getSlots();
-            for (final Slot slot : slots) {
-                System.out.println(slot + ", " + slot.getLectureMax() + ", " + slot.getLabMax() + ", " + slot.getLectureMin() + ", " + slot.getLabMin());
-                final Course[] courses = schedule.getCourses(slot);
-
+            if (courses.length > 0) {
+                System.out.println(slot);
                 for (final Course course : courses) {
-                    System.out.println("\t" + course);
+                    System.out.println("  " + course);
                 }
                 System.out.println();
             }
         }
+    }
+
+    public static int getProperty(final String name, final int defaultValue) {
+        final String property = System.getProperty(name);
+        if (property != null) {
+            try {
+                return Integer.parseInt(property);
+            } catch (final NumberFormatException e) {
+                System.err.println("Property: " + name + " must be an integer.");
+            }
+        }
+        return defaultValue;
     }
 }

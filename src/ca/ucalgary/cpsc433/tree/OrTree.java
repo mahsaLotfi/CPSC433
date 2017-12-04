@@ -4,11 +4,11 @@ import ca.ucalgary.cpsc433.environment.Course;
 import ca.ucalgary.cpsc433.environment.Environment;
 import ca.ucalgary.cpsc433.environment.Lab;
 import ca.ucalgary.cpsc433.environment.Lecture;
+import ca.ucalgary.cpsc433.environment.PartialAssign;
+import ca.ucalgary.cpsc433.environment.Unwanted;
 import ca.ucalgary.cpsc433.schedule.Assign;
-import ca.ucalgary.cpsc433.schedule.Day;
 import ca.ucalgary.cpsc433.schedule.Schedule;
 import ca.ucalgary.cpsc433.schedule.Slot;
-import ca.ucalgary.cpsc433.schedule.Time;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -49,14 +49,24 @@ public class OrTree {
     }
 
     public Schedule search() {
-        final int badSlot = findTuesday1230Slot();
-        final int n13Slot = findTuesday1800Slot();
-
         State current = new State(null, getSubtreeSize(0));
 
         int j = 0;
         for (int i = 0; i < lectures.length; i++) {
             if (environment.getPartialAssign(lectures[i]) != null) {
+                swap(lectures, i, j);
+                j++;
+                continue;
+            }
+
+            final int section = lectures[i].getSection();
+            if (section >= 90) {
+                swap(lectures, i, j);
+                j++;
+                continue;
+            }
+
+            if (environment.getUnwanted(lectures[i]).length > 0) {
                 swap(lectures, i, j);
                 j++;
                 continue;
@@ -73,7 +83,20 @@ public class OrTree {
         j = 0;
         for (int i = 0; i < labs.length; i++) {
             if (environment.getPartialAssign(labs[i]) != null) {
-                swap(lectures, i, j);
+                swap(labs, i, j);
+                j++;
+                continue;
+            }
+
+            final int section = labs[i].getSection();
+            if (section >= 90) {
+                swap(labs, i, j);
+                j++;
+                continue;
+            }
+
+            if (environment.getUnwanted(labs[i]).length > 0) {
+                swap(labs, i, j);
                 j++;
                 continue;
             }
@@ -97,6 +120,7 @@ public class OrTree {
                         return build;
                     } else {
                         current = new State(current, getSubtreeSize(depth));
+                        filter(getCourse(depth), current);
                     }
                 } else {
                     depth--;
@@ -158,30 +182,41 @@ public class OrTree {
         return new Schedule(environment, sub);
     }
 
-    private int findTuesday1230Slot() {
-        final Time time = new Time(12, 30);
-        for (int i = 0; i < lectureSlots.length; i++) {
-            if (lectureSlots[i].getDay() == Day.TUESDAY && lectureSlots[i].getTime().equals(time)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private int findTuesday1800Slot() {
-        final Time time = new Time(18, 0);
-        for (int i = 0; i < lectureSlots.length; i++) {
-            if (lectureSlots[i].getDay() == Day.TUESDAY && lectureSlots[i].getTime().equals(time)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     private void swap(final Object[] objects, final int i, final int j) {
         final Object temp = objects[i];
         objects[i] = objects[j];
         objects[j] = temp;
+    }
+
+    private void filter(final Course course, final State state) {
+        final Slot[] slots;
+        if (course.isLecture()) {
+            slots = lectureSlots;
+        } else {
+            slots = labSlots;
+        }
+        if (course.getSection() >= 90) {
+            for (int i = 0; i < slots.length; i++) {
+                if (!slots[i].getTime().isEvening()) {
+                    state.mark(i);
+                }
+            }
+        }
+        if (environment.getPartialAssign(course) != null) {
+            final PartialAssign assign = environment.getPartialAssign(course);
+            final Slot s = assign.getAssign().getSlot();
+            for (int i = 0; i < slots.length; i++) {
+                if (!slots[i].equals(s)) {
+                    state.mark(i);
+                }
+            }
+        }
+        final Unwanted[] unwanted = environment.getUnwanted(course);
+        if (unwanted.length > 0) {
+            for (final Unwanted un : unwanted) {
+                state.mark(un.getAssign().getSlot().getSlotID());
+            }
+        }
     }
 
     private class State {
@@ -216,6 +251,11 @@ public class OrTree {
 
         void mark() {
             this.subTrees[current] = true;
+            unchecked--;
+        }
+
+        void mark(int i) {
+            this.subTrees[i] = true;
             unchecked--;
         }
 

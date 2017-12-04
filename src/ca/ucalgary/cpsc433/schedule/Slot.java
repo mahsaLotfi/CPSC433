@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author Obicere
  */
-public class Slot {
+public class Slot implements Comparable<Slot> {
 
     private static final Map<Integer, Slot> CACHE = new ConcurrentHashMap<>();
 
@@ -144,5 +144,14 @@ public class Slot {
     @Override
     public String toString() {
         return day + ", " + time;
+    }
+
+    @Override
+    public int compareTo(final Slot o) {
+        final int dayCmp = day.compareTo(o.day);
+        if (dayCmp != 0) {
+            return dayCmp;
+        }
+        return getTime().compareTo(o.getTime());
     }
 }

@@ -1,5 +1,6 @@
 package ca.ucalgary.cpsc433.constraint.soft;
 
+import ca.ucalgary.cpsc433.Main;
 import ca.ucalgary.cpsc433.environment.Course;
 import ca.ucalgary.cpsc433.environment.Environment;
 import ca.ucalgary.cpsc433.schedule.Assign;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * @author Obicere
  */
-public class PairConstraint extends SoftConstraint {
+public class PairConstraint implements SoftConstraint {
 
     private final int penalty;
 
@@ -25,20 +26,8 @@ public class PairConstraint extends SoftConstraint {
     private boolean initialized = false;
 
     public PairConstraint() {
-        final int pPair = loadPenalty("pPair");
-        final int wPair = loadPenalty("wPair");
-
-        if (pPair >= 0) {
-            this.penalty = pPair;
-        } else {
-            this.penalty = 1;
-        }
-
-        if (wPair >= 0) {
-            this.weight = wPair;
-        } else {
-            this.weight = 1;
-        }
+        this.penalty = Main.getProperty("pPair", 15);
+        this.weight = Main.getProperty("wPair", 4);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package ca.ucalgary.cpsc433.schedule;
 
 import ca.ucalgary.cpsc433.environment.Course;
-import ca.ucalgary.cpsc433.environment.Lecture;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,7 +60,7 @@ public class Assign {
         if (endTime != null) {
             return endTime;
         }
-        if (course instanceof Lecture) {
+        if (course.isLecture()) {
             this.endTime = slot.getLectureEndTime();
         } else {
             this.endTime = slot.getLabEndTime();
@@ -74,6 +73,9 @@ public class Assign {
     }
 
     public boolean collides(final Assign other) {
+        if (slot == other.slot) {
+            return true;
+        }
         final Time start = getStartTime();
         final Time end = getEndTime();
         return other.contains(start) || other.contains(end);

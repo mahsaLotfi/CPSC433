@@ -117,6 +117,8 @@ public class Schedule implements Comparable<Schedule> {
         return evaluation;
     }
 
+    public static int[] failures = null;
+
     public boolean isValid() {
         if (validCached) {
             return valid;
@@ -125,12 +127,19 @@ public class Schedule implements Comparable<Schedule> {
 
         final HardConstraint[] hardConstraints = environment.getHardConstraints();
 
+        if (failures == null) {
+            failures = new int[hardConstraints.length];
+        }
+
+        int i = 0;
         for (final HardConstraint constraint : hardConstraints) {
             final boolean satisfied = constraint.isSatisfied(this);
             if (!satisfied) {
                 valid = false;
+                failures[i]++;
                 break;
             }
+            i++;
         }
 
         this.valid = valid;

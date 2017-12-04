@@ -2,6 +2,7 @@ package ca.ucalgary.cpsc433.environment;
 
 import ca.ucalgary.cpsc433.constraint.hard.CPSC813Constraint;
 import ca.ucalgary.cpsc433.constraint.hard.CPSC913Constraint;
+import ca.ucalgary.cpsc433.constraint.hard.CourseConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.EveningConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.FifthYearConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.HardConstraint;
@@ -9,8 +10,11 @@ import ca.ucalgary.cpsc433.constraint.hard.MaxConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.NotCompatibleConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.PartialAssignmentConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.TuesdayElevenConstraint;
+import ca.ucalgary.cpsc433.constraint.hard.UnwantedConstraint;
 import ca.ucalgary.cpsc433.constraint.soft.MinConstraint;
 import ca.ucalgary.cpsc433.constraint.soft.PairConstraint;
+import ca.ucalgary.cpsc433.constraint.soft.PreferenceConstraint;
+import ca.ucalgary.cpsc433.constraint.soft.SectionConstraint;
 import ca.ucalgary.cpsc433.constraint.soft.SoftConstraint;
 import ca.ucalgary.cpsc433.schedule.Slot;
 
@@ -83,11 +87,15 @@ public class Environment {
         hard.add(new CPSC813Constraint());
         hard.add(new CPSC913Constraint());
         hard.add(new NotCompatibleConstraint());
+        hard.add(new CourseConstraint());
+        hard.add(new UnwantedConstraint());
 
         final List<SoftConstraint> soft = new ArrayList<>();
 
         soft.add(new MinConstraint());
         soft.add(new PairConstraint());
+        soft.add(new PreferenceConstraint());
+        soft.add(new SectionConstraint());
 
         HARD_CONSTRAINTS = hard.toArray(new HardConstraint[hard.size()]);
         SOFT_CONSTRAINTS = soft.toArray(new SoftConstraint[soft.size()]);

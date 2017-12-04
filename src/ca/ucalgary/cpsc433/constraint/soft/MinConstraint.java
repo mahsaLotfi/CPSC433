@@ -1,5 +1,6 @@
 package ca.ucalgary.cpsc433.constraint.soft;
 
+import ca.ucalgary.cpsc433.Main;
 import ca.ucalgary.cpsc433.environment.Environment;
 import ca.ucalgary.cpsc433.schedule.Schedule;
 import ca.ucalgary.cpsc433.schedule.Slot;
@@ -7,7 +8,7 @@ import ca.ucalgary.cpsc433.schedule.Slot;
 /**
  * @author Obicere
  */
-public class MinConstraint extends SoftConstraint {
+public class MinConstraint implements SoftConstraint {
 
     private final int penaltyLab;
 
@@ -16,25 +17,9 @@ public class MinConstraint extends SoftConstraint {
     private final int weight;
 
     public MinConstraint() {
-        final int pLab = loadPenalty("pLab");
-        final int pLecture = loadPenalty("pLec");
-        final int wMin = loadPenalty("wMin");
-
-        if (pLab >= 0) {
-            penaltyLab = pLab;
-        } else {
-            penaltyLab = 1;
-        }
-        if (pLecture >= 0) {
-            penaltyLecture = pLecture;
-        } else {
-            penaltyLecture = 1;
-        }
-        if (wMin >= 0) {
-            weight = wMin;
-        } else {
-            weight = 1;
-        }
+        this.penaltyLab = Main.getProperty("pLab", 20);
+        this.penaltyLecture = Main.getProperty("pLec", 20);
+        this.weight = Main.getProperty("wMin", 5);
     }
 
     @Override
