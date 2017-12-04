@@ -41,6 +41,10 @@ public class CPSC813Constraint implements HardConstraint {
         }
         for (final Lecture lecture : cpsc813) {
             final Assign assign = schedule.getAssign(lecture);
+            final Slot assigned = assign.getSlot();
+            if(!assigned.equals(target)) {
+                return false;
+            }
             for (int i = 0; i < nonCompatibles.length; i++) {
                 final Course other = nonCompatibles[i];
                 if(other != null && assigns[i].collides(assign)) {

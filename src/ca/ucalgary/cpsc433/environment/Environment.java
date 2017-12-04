@@ -1,5 +1,7 @@
 package ca.ucalgary.cpsc433.environment;
 
+import ca.ucalgary.cpsc433.constraint.hard.CPSC813Constraint;
+import ca.ucalgary.cpsc433.constraint.hard.CPSC913Constraint;
 import ca.ucalgary.cpsc433.constraint.hard.HardConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.LabMaxConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.LectureMaxConstraint;
@@ -14,6 +16,12 @@ import java.util.List;
  * @author Obicere
  */
 public class Environment {
+
+    private static final Course[] EMPTY_COURSE = new Course[0];
+
+    private static final Unwanted[] EMPTY_UNWANTED = new Unwanted[0];
+
+    private static final Preference[] EMPTY_PREFERENCE = new Preference[0];
 
     private static final HardConstraint[] HARD_CONSTRAINTS;
 
@@ -63,6 +71,9 @@ public class Environment {
         final List<HardConstraint> hard = new ArrayList<>();
         hard.add(new LectureMaxConstraint());
         hard.add(new LabMaxConstraint());
+
+        hard.add(new CPSC813Constraint());
+        hard.add(new CPSC913Constraint());
 
         final List<SoftConstraint> soft = new ArrayList<>();
 
@@ -252,7 +263,12 @@ public class Environment {
 
     public Course[] getNonCompatibles(final Course course) {
         final int id = getCourseID(course);
-        return notCompatibles[id];
+        final Course[] result = notCompatibles[id];
+        if (result == null) {
+            return EMPTY_COURSE;
+        } else {
+            return result;
+        }
     }
 
     public boolean hasNonCompatibles() {
@@ -261,7 +277,12 @@ public class Environment {
 
     public Unwanted[] getUnwanted(final Course course) {
         final int id = getCourseID(course);
-        return unwanted[id];
+        final Unwanted[] result = unwanted[id];
+        if (result == null) {
+            return EMPTY_UNWANTED;
+        } else {
+            return result;
+        }
     }
 
     public boolean hasUnwanted() {
@@ -270,7 +291,12 @@ public class Environment {
 
     public Preference[] getPreferences(final Course course) {
         final int id = getCourseID(course);
-        return preferences[id];
+        final Preference[] result = preferences[id];
+        if (result == null) {
+            return EMPTY_PREFERENCE;
+        } else {
+            return result;
+        }
     }
 
     public boolean hasPreferences() {
@@ -279,7 +305,12 @@ public class Environment {
 
     public Course[] getPairs(final Course course) {
         final int id = getCourseID(course);
-        return pairs[id];
+        final Course[] result = pairs[id];
+        if (result == null) {
+            return EMPTY_COURSE;
+        } else {
+            return result;
+        }
     }
 
     public boolean hasPairs() {
