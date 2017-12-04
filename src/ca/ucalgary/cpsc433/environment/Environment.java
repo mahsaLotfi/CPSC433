@@ -5,6 +5,7 @@ import ca.ucalgary.cpsc433.constraint.hard.CPSC913Constraint;
 import ca.ucalgary.cpsc433.constraint.hard.HardConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.LabMaxConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.LectureMaxConstraint;
+import ca.ucalgary.cpsc433.constraint.hard.TuesdayElevenConstraint;
 import ca.ucalgary.cpsc433.constraint.soft.SoftConstraint;
 import ca.ucalgary.cpsc433.schedule.Slot;
 
@@ -72,6 +73,7 @@ public class Environment {
         hard.add(new LectureMaxConstraint());
         hard.add(new LabMaxConstraint());
 
+        hard.add(new TuesdayElevenConstraint());
         hard.add(new CPSC813Constraint());
         hard.add(new CPSC913Constraint());
 
