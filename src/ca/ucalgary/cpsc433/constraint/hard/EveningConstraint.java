@@ -29,12 +29,12 @@ public class EveningConstraint implements HardConstraint {
 	private void initialize(final Environment environment) {
 		initialized = true;
 
-	    final Lecture[] allLectures = environment.getLectures();
+	    final Course[] allCourses = environment.getCourses();
 	    evening = new ArrayList<>();
 
-	    for (final Lecture lecture : allLectures) {
-	    	if (lecture.getSection() > 9 ) {
-	    		evening.add(lecture);
+	    for (final Course course : allLectures) {
+	    	if (course.getSection() >= 90 ) {
+	    		evening.add(course);
 	        }
 	    }
 	}
