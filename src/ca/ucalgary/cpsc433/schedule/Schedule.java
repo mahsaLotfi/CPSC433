@@ -6,6 +6,7 @@ import ca.ucalgary.cpsc433.environment.Course;
 import ca.ucalgary.cpsc433.environment.Environment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author Obicere
@@ -28,6 +29,8 @@ public class Schedule implements Comparable<Schedule> {
 
     private byte[] lectureCounts;
 
+    private final int actualAssignments;
+
     public Schedule(final Environment environment) {
         this(environment, EMPTY_ASSIGNS);
     }
@@ -38,14 +41,17 @@ public class Schedule implements Comparable<Schedule> {
         }
         ensureNonNull(assigns);
         this.environment = environment;
+        this.actualAssignments = assigns.length;
 
         buildSlots(assigns);
     }
 
     private void buildSlots(final Assign[] original) {
-        assigns = new byte[original.length];
+        assigns = new byte[environment.getCourseCount()];
         labCounts = new byte[environment.getSlotCount()];
         lectureCounts = new byte[environment.getSlotCount()];
+
+        Arrays.fill(assigns, (byte) -1);
 
         for (final Assign assign : original) {
             final Course course = assign.getCourse();
@@ -64,20 +70,28 @@ public class Schedule implements Comparable<Schedule> {
     }
 
     public Assign[] getAssigns() {
-        return getAssigns(0, assigns.length);
+        return getAssigns(0, actualAssignments);
     }
 
     public Assign[] getAssigns(final int start, final int length) {
+        int j = 0;
         final Assign[] newAssigns = new Assign[length];
         for (int i = 0; i < length; i++) {
-            newAssigns[i + start] = getAssign(i);
+            final Assign assign = getAssign(i + start);
+            if(assign != null) {
+                newAssigns[j++] = assign;
+            }
         }
         return newAssigns;
     }
 
     public Assign getAssign(final Course course) {
         final int courseID = environment.getCourseID(course);
-        final Slot slot = environment.getSlot(assigns[courseID]);
+        final int slotID = assigns[courseID];
+        if(slotID == -1) {
+            return null;
+        }
+        final Slot slot = environment.getSlot(slotID);
         return Assign.getAssign(course, slot);
     }
 
