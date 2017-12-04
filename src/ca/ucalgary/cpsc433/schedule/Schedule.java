@@ -78,7 +78,7 @@ public class Schedule implements Comparable<Schedule> {
         final Assign[] newAssigns = new Assign[length];
         for (int i = 0; i < length; i++) {
             final Assign assign = getAssign(i + start);
-            if(assign != null) {
+            if (assign != null) {
                 newAssigns[j++] = assign;
             }
         }
@@ -88,7 +88,7 @@ public class Schedule implements Comparable<Schedule> {
     public Assign getAssign(final Course course) {
         final int courseID = environment.getCourseID(course);
         final int slotID = assigns[courseID];
-        if(slotID == -1) {
+        if (slotID == -1) {
             return null;
         }
         final Slot slot = environment.getSlot(slotID);

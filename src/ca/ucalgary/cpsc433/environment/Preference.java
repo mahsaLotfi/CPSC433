@@ -49,7 +49,7 @@ public class Preference {
 
     @Override
     public String toString() {
-        return "Preference[" + assign + ", " + value+"]";
+        return "Preference[" + assign + ", " + value + "]";
     }
 
 }
