@@ -7,6 +7,7 @@ import ca.ucalgary.cpsc433.constraint.hard.HardConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.MaxConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.PartialAssignmentConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.TuesdayElevenConstraint;
+import ca.ucalgary.cpsc433.constraint.hard.EveningConstraint;
 import ca.ucalgary.cpsc433.constraint.soft.MinConstraint;
 import ca.ucalgary.cpsc433.constraint.soft.SoftConstraint;
 import ca.ucalgary.cpsc433.schedule.Slot;
@@ -75,6 +76,7 @@ public class Environment {
         hard.add(new MaxConstraint());
         hard.add(new PartialAssignmentConstraint());
         hard.add(new FifthYearConstraint());
+        hard.add(new EveningConstraint());
         hard.add(new TuesdayElevenConstraint());
         hard.add(new CPSC813Constraint());
         hard.add(new CPSC913Constraint());
