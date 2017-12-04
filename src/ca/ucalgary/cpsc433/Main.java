@@ -4,11 +4,6 @@ import ca.ucalgary.cpsc433.environment.Course;
 import ca.ucalgary.cpsc433.environment.Environment;
 import ca.ucalgary.cpsc433.environment.Lab;
 import ca.ucalgary.cpsc433.environment.Lecture;
-import ca.ucalgary.cpsc433.environment.NotCompatible;
-import ca.ucalgary.cpsc433.environment.Pair;
-import ca.ucalgary.cpsc433.environment.PartialAssign;
-import ca.ucalgary.cpsc433.environment.Preference;
-import ca.ucalgary.cpsc433.environment.Unwanted;
 import ca.ucalgary.cpsc433.io.InputParser;
 import ca.ucalgary.cpsc433.schedule.Schedule;
 import ca.ucalgary.cpsc433.schedule.Slot;
@@ -40,31 +35,6 @@ public class Main {
             }
             System.out.println();
         }
-
-        for (final Preference preference : environment.getPreferences()) {
-            System.out.println(preference);
-        }
-        System.out.println();
-
-        for (final NotCompatible compatible : environment.getNotCompatibles()) {
-            System.out.println(compatible);
-        }
-        System.out.println();
-
-        for (final Pair pair : environment.getPairs()) {
-            System.out.println(pair);
-        }
-        System.out.println();
-
-        for (final PartialAssign partialAssign : environment.getPartialAssigns()) {
-            System.out.println(partialAssign);
-        }
-        System.out.println();
-
-        for (final Unwanted unwanted : environment.getUnwanted()) {
-            System.out.println(unwanted);
-        }
-        System.out.println();
 
         long sum = 0;
         int length = 100000;

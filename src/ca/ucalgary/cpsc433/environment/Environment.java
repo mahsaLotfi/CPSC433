@@ -7,6 +7,7 @@ import ca.ucalgary.cpsc433.constraint.soft.SoftConstraint;
 import ca.ucalgary.cpsc433.schedule.Slot;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -30,19 +31,31 @@ public class Environment {
 
     private final Lecture[] lectures;
 
-    private final NotCompatible[] notCompatibles;
-
-    private final Pair[] pairs;
-
-    private final PartialAssign[] partialAssigns;
-
-    private final Preference[] preferences;
-
-    private final Unwanted[] unwanted;
+    private final int courseCount;
 
     private final HardConstraint[] hardConstraints = HARD_CONSTRAINTS;
 
     private final SoftConstraint[] softConstraints = SOFT_CONSTRAINTS;
+
+    private final Course[][] notCompatibles;
+
+    private final int notCompatibleCount;
+
+    private final Unwanted[][] unwanted;
+
+    private final int unwantedCount;
+
+    private final Preference[][] preferences;
+
+    private final int preferenceCount;
+
+    private final Course[][] pairs;
+
+    private final int pairsCount;
+
+    private final PartialAssign[] partialAssigns;
+
+    private final int partialAssignsCount;
 
     private final CourseDirectory directory;
 
@@ -61,16 +74,101 @@ public class Environment {
         this.name = name;
         this.lectureSlots = lectureSlots;
         this.labSlots = labSlots;
-        this.notCompatibles = notCompatibles;
-        this.unwanted = unwanted;
-        this.preferences = preferences;
-        this.pairs = pairs;
-        this.partialAssigns = partialAssigns;
+
+        this.notCompatibleCount = notCompatibles.length;
+        this.unwantedCount = unwanted.length;
+        this.preferenceCount = preferences.length;
+        this.pairsCount = pairs.length;
+        this.partialAssignsCount = partialAssigns.length;
 
         this.slots = Slot.getSlots();
         this.lectures = Lecture.getLectures();
         this.labs = Lab.getLabs();
+
+        this.courseCount = lectures.length + labs.length;
+
         this.directory = new CourseDirectory(this);
+
+        this.notCompatibles = buildNotCompatibles(notCompatibles);
+        this.unwanted = buildUnwanted(unwanted);
+        this.preferences = buildPreferences(preferences);
+        this.pairs = buildPairs(pairs);
+        this.partialAssigns = buildPartialAssigns(partialAssigns);
+    }
+
+    private Course[][] buildNotCompatibles(final NotCompatible[] notCompatibles) {
+        final Course[][] value = new Course[courseCount][];
+        for (int i = 0; i < courseCount; i++) {
+            final Course course = getCourse(i);
+            final List<Course> list = new LinkedList<>();
+            for (final NotCompatible notCompatible : notCompatibles) {
+                if (notCompatible.getRight().equals(course)) {
+                    list.add(notCompatible.getLeft());
+                } else if (notCompatible.getLeft().equals(course)) {
+                    list.add(notCompatible.getRight());
+                }
+            }
+            value[i] = list.toArray(new Course[list.size()]);
+        }
+        return value;
+    }
+
+    private Unwanted[][] buildUnwanted(final Unwanted[] unwanteds) {
+        final Unwanted[][] value = new Unwanted[courseCount][];
+        for (int i = 0; i < courseCount; i++) {
+            final Course course = getCourse(i);
+            final List<Unwanted> list = new LinkedList<>();
+            for (final Unwanted unwanted : unwanteds) {
+                if (unwanted.getAssign().getCourse().equals(course)) {
+                    list.add(unwanted);
+                }
+            }
+            value[i] = list.toArray(new Unwanted[list.size()]);
+        }
+        return value;
+    }
+
+    private Preference[][] buildPreferences(final Preference[] preferences) {
+        final Preference[][] value = new Preference[courseCount][];
+        for (int i = 0; i < courseCount; i++) {
+            final Course course = getCourse(i);
+            final List<Preference> list = new LinkedList<>();
+            for (final Preference preference : preferences) {
+                if (preference.getAssign().getCourse().equals(course)) {
+                    list.add(preference);
+                }
+            }
+            value[i] = list.toArray(new Preference[list.size()]);
+        }
+        return value;
+    }
+
+    private Course[][] buildPairs(final Pair[] pairs) {
+        final Course[][] value = new Course[courseCount][];
+        for (int i = 0; i < courseCount; i++) {
+            final Course course = getCourse(i);
+            final List<Course> list = new LinkedList<>();
+            for (final Pair pair : pairs) {
+                if (pair.getRight().equals(course)) {
+                    list.add(pair.getLeft());
+                } else if (pair.getLeft().equals(course)) {
+                    list.add(pair.getRight());
+                }
+            }
+            value[i] = list.toArray(new Course[list.size()]);
+        }
+        return value;
+    }
+
+    private PartialAssign[] buildPartialAssigns(final PartialAssign[] partialAssigns) {
+        final PartialAssign[] value = new PartialAssign[courseCount];
+        for (final PartialAssign partialAssign : partialAssigns) {
+            final Course course = partialAssign.getAssign().getCourse();
+            final int id = getCourseID(course);
+
+            value[id] = partialAssign;
+        }
+        return value;
     }
 
     public String getName() {
@@ -129,49 +227,65 @@ public class Environment {
         return lectures[id];
     }
 
-    @Deprecated
-    public NotCompatible[] getNotCompatibles() {
-        return notCompatibles.clone();
+    public Course getCourse(final int id) {
+        if (id < lectures.length) {
+            return lectures[id];
+        } else {
+            return labs[id - lectures.length];
+        }
     }
 
-    @Deprecated
-    public Unwanted[] getUnwanted() {
-        return unwanted.clone();
-    }
-
-    @Deprecated
-    public Preference[] getPreferences() {
-        return preferences.clone();
-    }
-
-    @Deprecated
-    public Pair[] getPairs() {
-        return pairs.clone();
-    }
-
-    @Deprecated
-    public PartialAssign[] getPartialAssigns() {
-        return partialAssigns.clone();
+    public int getCourseID(final Course course) {
+        if (course.isLecture()) {
+            return course.getID();
+        } else {
+            return course.getID() + lectures.length;
+        }
     }
 
     public Course[] getNonCompatibles(final Course course) {
-        // TODO
-        return null;
+        final int id = getCourseID(course);
+        return notCompatibles[id];
+    }
+
+    public boolean hasNonCompatibles() {
+        return notCompatibleCount > 0;
+    }
+
+    public Unwanted[] getUnwanted(final Course course) {
+        final int id = getCourseID(course);
+        return unwanted[id];
+    }
+
+    public boolean hasUnwanted() {
+        return unwantedCount > 0;
     }
 
     public Preference[] getPreferences(final Course course) {
-        // TODO
-        return null;
+        final int id = getCourseID(course);
+        return preferences[id];
+    }
+
+    public boolean hasPreferences() {
+        return preferenceCount > 0;
     }
 
     public Course[] getPairs(final Course course) {
-        // TODO
-        return null;
+        final int id = getCourseID(course);
+        return pairs[id];
+    }
+
+    public boolean hasPairs() {
+        return pairsCount > 0;
     }
 
     public PartialAssign getPartialAssign(final Course course) {
-        // TODO
-        return null;
+        final int id = getCourseID(course);
+        return partialAssigns[id];
+    }
+
+    public boolean hasPartialAssigns() {
+        return partialAssignsCount > 0;
     }
 
     public HardConstraint[] getHardConstraints() {
@@ -184,5 +298,17 @@ public class Environment {
 
     public CourseDirectory getDirectory() {
         return directory;
+    }
+
+    public Course[] getCourses(final String type, final int number) {
+        return directory.getCourses(type, number);
+    }
+
+    public Lecture[] getLectures(final String type, final int number) {
+        return directory.getLectures(type, number);
+    }
+
+    public Lab[] getLabs(final String type, final int number) {
+        return directory.getLabs(type, number);
     }
 }
