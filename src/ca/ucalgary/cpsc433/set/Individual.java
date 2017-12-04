@@ -1,4 +1,4 @@
-package ca.ucalgary.cpsc433;
+package ca.ucalgary.cpsc433.set;
 
 import ca.ucalgary.cpsc433.schedule.Assign;
 import ca.ucalgary.cpsc433.schedule.Schedule;
