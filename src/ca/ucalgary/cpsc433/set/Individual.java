@@ -32,5 +32,13 @@ public class Individual implements Comparable<Individual>{
 	public Assign[] getSegment(int start, int length) {
 		return schedule.getAssigns(start, length);
 	}
+	
+	public Schedule getSchedule() {
+		return schedule;
+	}
+	
+	public int getFitness() {
+		return fitness;
+	}
 
 }

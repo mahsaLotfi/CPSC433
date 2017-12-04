@@ -71,7 +71,8 @@ public class Environment {
     static {
         final List<HardConstraint> hard = new ArrayList<>();
         hard.add(new MaxConstraint());
-
+        
+        hard.add(new FifthYearConstraint());
         hard.add(new TuesdayElevenConstraint());
         hard.add(new CPSC813Constraint());
         hard.add(new CPSC913Constraint());
