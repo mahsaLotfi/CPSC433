@@ -37,7 +37,9 @@ public class Main {
         boolean solutionFound = true;
         long sum = 0;
         long evaluation = 0;
-        int length = 1;
+        int minEval = Integer.MAX_VALUE;
+        int maxEval = Integer.MIN_VALUE;
+        int length = 100;
         final Schedule[] schedules = new Schedule[length];
         for (int i = 0; i < length; i++) {
             final OrTree tree = new OrTree(environment);
@@ -52,12 +54,20 @@ public class Main {
             }
 
             sum += (System.nanoTime() - start);
-            evaluation += schedules[i].getEvaluation();
+            final int eval = schedules[i].getEvaluation();
+
+            evaluation += eval;
+            if (eval > maxEval) {
+                maxEval = eval;
+            }
+            if (eval < minEval) {
+                minEval = eval;
+            }
         }
 
         if (solutionFound) {
             System.out.printf("Average time per tree: %f\n", (sum / (double) length));
-            System.out.printf("Average evaluation: %f\n", (evaluation / (double) length));
+            System.out.printf("Average evaluation: %f, Min: %d, Max: %d\n", (evaluation / (double) length), minEval, maxEval);
 
             final Schedule schedule = schedules[(int) (Math.random() * schedules.length)];
 

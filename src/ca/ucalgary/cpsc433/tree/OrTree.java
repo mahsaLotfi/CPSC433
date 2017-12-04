@@ -86,14 +86,14 @@ public class OrTree {
                 final Course course = getCourse(depth);
                 final Slot slot = getSlot(depth, current.current);
 
-                System.out.println(depth + ": Assigning " + course + " to " + slot);
+                // System.out.println(depth + ": Assigning " + course + " to " + slot);
                 schedule[depth] = Assign.getAssign(course, slot);
                 depth++;
 
                 Schedule build = build();
                 if (build.isValid()) {
                     if (isComplete()) {
-                        System.out.println("Found valid solution");
+                        // System.out.println("Found valid solution");
                         return build;
                     } else {
                         current = new State(current, getSubtreeSize(depth));
@@ -103,7 +103,7 @@ public class OrTree {
                     current.mark();
                 }
             }
-            System.out.println("Going back");
+            // System.out.println("Going back");
             current = goBack(current);
         }
         return null;
