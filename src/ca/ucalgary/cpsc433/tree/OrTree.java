@@ -4,7 +4,6 @@ import ca.ucalgary.cpsc433.environment.Course;
 import ca.ucalgary.cpsc433.environment.Environment;
 import ca.ucalgary.cpsc433.environment.Lab;
 import ca.ucalgary.cpsc433.environment.Lecture;
-import ca.ucalgary.cpsc433.environment.PartialAssign;
 import ca.ucalgary.cpsc433.schedule.Assign;
 import ca.ucalgary.cpsc433.schedule.Day;
 import ca.ucalgary.cpsc433.schedule.Schedule;
@@ -32,8 +31,6 @@ public class OrTree {
 
     private final Lab[] labs;
 
-    private final PartialAssign[] partialAssign;
-
     private final SecureRandom random;
 
     private int depth = 0;
@@ -46,7 +43,6 @@ public class OrTree {
         this.labSlots = environment.getLabSlots();
         this.lectures = environment.getLectures();
         this.labs = environment.getLabs();
-        this.partialAssign = environment.getPartialAssigns();
         this.random = new SecureRandom();
 
         this.schedule = new Assign[lectures.length + labs.length];

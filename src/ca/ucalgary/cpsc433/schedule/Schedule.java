@@ -16,8 +16,6 @@ public class Schedule implements Comparable<Schedule> {
 
     private final Environment environment;
 
-    private final int lectureCount;
-
     private int evaluation = -1;
 
     private boolean valid = false;
@@ -40,7 +38,6 @@ public class Schedule implements Comparable<Schedule> {
         }
         ensureNonNull(assigns);
         this.environment = environment;
-        this.lectureCount = environment.getLectureCount();
 
         buildSlots(assigns);
     }
@@ -54,8 +51,9 @@ public class Schedule implements Comparable<Schedule> {
             final Course course = assign.getCourse();
             final Slot slot = assign.getSlot();
             final int slotID = slot.getSlotID();
+            final int courseID = environment.getCourseID(course);
 
-            assigns[course.getID()] = (byte) slotID;
+            assigns[courseID] = (byte) slotID;
 
             if (course.isLecture()) {
                 lectureCounts[slotID]++;
@@ -78,28 +76,14 @@ public class Schedule implements Comparable<Schedule> {
     }
 
     public Assign getAssign(final Course course) {
-        final Slot slot;
-        if (course.isLecture()) {
-            slot = environment.getSlot(course.getID());
-        } else {
-            slot = environment.getSlot(course.getID() + lectureCount);
-        }
+        final int courseID = environment.getCourseID(course);
+        final Slot slot = environment.getSlot(assigns[courseID]);
         return Assign.getAssign(course, slot);
     }
 
     public Assign getAssign(final int courseID) {
-        final Course course = getCourse(courseID);
+        final Course course = environment.getCourse(courseID);
         return getAssign(course);
-    }
-
-    private Course getCourse(final int courseID) {
-        final Course course;
-        if (courseID < lectureCount) {
-            course = environment.getLecture(courseID);
-        } else {
-            course = environment.getLab(courseID - lectureCount);
-        }
-        return course;
     }
 
     public int getEvaluation() {
@@ -172,7 +156,7 @@ public class Schedule implements Comparable<Schedule> {
         for (int i = 0; i < assigns.length; i++) {
             final int assign = assigns[i];
             if (assign == slot.getSlotID()) {
-                final Course course = getCourse(i);
+                final Course course = environment.getCourse(i);
                 courses.add(course);
             }
         }

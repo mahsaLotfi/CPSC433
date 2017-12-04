@@ -31,7 +31,7 @@ public class Environment {
 
     private final Lecture[] lectures;
 
-    private final int courseCount;
+    private final Course[] courses;
 
     private final HardConstraint[] hardConstraints = HARD_CONSTRAINTS;
 
@@ -85,7 +85,10 @@ public class Environment {
         this.lectures = Lecture.getLectures();
         this.labs = Lab.getLabs();
 
-        this.courseCount = lectures.length + labs.length;
+        this.courses = new Course[lectures.length + labs.length];
+
+        System.arraycopy(lectures, 0, courses, 0, lectures.length);
+        System.arraycopy(labs, 0, courses, lectures.length, labs.length);
 
         this.directory = new CourseDirectory(this);
 
@@ -97,8 +100,8 @@ public class Environment {
     }
 
     private Course[][] buildNotCompatibles(final NotCompatible[] notCompatibles) {
-        final Course[][] value = new Course[courseCount][];
-        for (int i = 0; i < courseCount; i++) {
+        final Course[][] value = new Course[courses.length][];
+        for (int i = 0; i < courses.length; i++) {
             final Course course = getCourse(i);
             final List<Course> list = new LinkedList<>();
             for (final NotCompatible notCompatible : notCompatibles) {
@@ -114,8 +117,8 @@ public class Environment {
     }
 
     private Unwanted[][] buildUnwanted(final Unwanted[] unwanteds) {
-        final Unwanted[][] value = new Unwanted[courseCount][];
-        for (int i = 0; i < courseCount; i++) {
+        final Unwanted[][] value = new Unwanted[courses.length][];
+        for (int i = 0; i < courses.length; i++) {
             final Course course = getCourse(i);
             final List<Unwanted> list = new LinkedList<>();
             for (final Unwanted unwanted : unwanteds) {
@@ -129,8 +132,8 @@ public class Environment {
     }
 
     private Preference[][] buildPreferences(final Preference[] preferences) {
-        final Preference[][] value = new Preference[courseCount][];
-        for (int i = 0; i < courseCount; i++) {
+        final Preference[][] value = new Preference[courses.length][];
+        for (int i = 0; i < courses.length; i++) {
             final Course course = getCourse(i);
             final List<Preference> list = new LinkedList<>();
             for (final Preference preference : preferences) {
@@ -144,8 +147,8 @@ public class Environment {
     }
 
     private Course[][] buildPairs(final Pair[] pairs) {
-        final Course[][] value = new Course[courseCount][];
-        for (int i = 0; i < courseCount; i++) {
+        final Course[][] value = new Course[courses.length][];
+        for (int i = 0; i < courses.length; i++) {
             final Course course = getCourse(i);
             final List<Course> list = new LinkedList<>();
             for (final Pair pair : pairs) {
@@ -161,7 +164,7 @@ public class Environment {
     }
 
     private PartialAssign[] buildPartialAssigns(final PartialAssign[] partialAssigns) {
-        final PartialAssign[] value = new PartialAssign[courseCount];
+        final PartialAssign[] value = new PartialAssign[courses.length];
         for (final PartialAssign partialAssign : partialAssigns) {
             final Course course = partialAssign.getAssign().getCourse();
             final int id = getCourseID(course);
@@ -176,7 +179,7 @@ public class Environment {
     }
 
     public Slot[] getLabSlots() {
-        return labSlots.clone();
+        return labSlots;
     }
 
     public int getLabSlotCount() {
@@ -184,7 +187,7 @@ public class Environment {
     }
 
     public Slot[] getLectureSlots() {
-        return lectureSlots.clone();
+        return lectureSlots;
     }
 
     public int getLectureSlotCount() {
@@ -192,7 +195,7 @@ public class Environment {
     }
 
     public Slot[] getSlots() {
-        return slots.clone();
+        return slots;
     }
 
     public Slot getSlot(final int id) {
@@ -208,7 +211,7 @@ public class Environment {
     }
 
     public Lab[] getLabs() {
-        return labs.clone();
+        return labs;
     }
 
     public Lab getLab(final int id) {
@@ -220,19 +223,23 @@ public class Environment {
     }
 
     public Lecture[] getLectures() {
-        return lectures.clone();
+        return lectures;
     }
 
     public Lecture getLecture(final int id) {
         return lectures[id];
     }
 
+    public Course[] getCourses() {
+        return courses;
+    }
+
+    public int getCourseCount() {
+        return courses.length;
+    }
+
     public Course getCourse(final int id) {
-        if (id < lectures.length) {
-            return lectures[id];
-        } else {
-            return labs[id - lectures.length];
-        }
+        return courses[id];
     }
 
     public int getCourseID(final Course course) {
