@@ -52,10 +52,32 @@ public class OrTree {
         final int badSlot = findTuesday1230Slot();
         final int n13Slot = findTuesday1800Slot();
 
-        final int[] slot500 = new int[get500Count()];
-        Arrays.fill(slot500, -1);
-
         State current = new State(null, getSubtreeSize(0));
+
+        int j = 0;
+        for (int i = 0; i < lectures.length; i++) {
+            if (environment.getPartialAssign(lectures[i]) != null) {
+                swap(lectures, i, j);
+                j++;
+                continue;
+            }
+
+            final int number = lectures[i].getNumber();
+            if (number >= 500 && number < 600) {
+                swap(lectures, i, j);
+                j++;
+                continue;
+            }
+        }
+
+        j = 0;
+        for (int i = 0; i < labs.length; i++) {
+            if (environment.getPartialAssign(labs[i]) != null) {
+                swap(lectures, i, j);
+                j++;
+                continue;
+            }
+        }
 
         while (current != null) {
             while (!current.isComplete()) {
@@ -64,14 +86,14 @@ public class OrTree {
                 final Course course = getCourse(depth);
                 final Slot slot = getSlot(depth, current.current);
 
-                // System.out.println(depth + ": Assigning " + course + " to " + slot);
+                System.out.println(depth + ": Assigning " + course + " to " + slot);
                 schedule[depth] = Assign.getAssign(course, slot);
                 depth++;
 
                 Schedule build = build();
                 if (build.isValid()) {
                     if (isComplete()) {
-                        // System.out.println("Found valid solution");
+                        System.out.println("Found valid solution");
                         return build;
                     } else {
                         current = new State(current, getSubtreeSize(depth));
@@ -81,45 +103,8 @@ public class OrTree {
                     current.mark();
                 }
             }
-            // System.out.println("Going back");
+            System.out.println("Going back");
             current = goBack(current);
-            /*
-            current.assign();
-
-            final Course course = getCourse(depth - 1);
-            final Slot slot = getSlot(depth - 1, current.current);
-
-            // System.out.println((depth - 1) + ": Assigning " + course + " to " + slot);
-            schedule[depth - 1] = Assign.getAssign(course, slot);
-
-            Schedule build = build();
-            if (build.isValid()) {
-                if (isComplete()) {
-                    // System.out.println("Found valid solution");
-                    return build;
-                }
-            }
-            if (!build().isValid()) {
-                current = goBack(current);
-                if (current == null) {
-                    return null;
-                }
-            }
-            if (current.isComplete()) {
-                // System.out.println("Found invalid solution");
-                do {
-                    current = goBack(current);
-                    if (current == null) {
-                        return null;
-                    }
-                } while (current.isComplete());
-            }
-
-            final int subCount = getSubtreeSize(depth);
-            current = new State(current, subCount);
-
-            depth++;
-            */
         }
         return null;
     }
@@ -173,16 +158,6 @@ public class OrTree {
         return new Schedule(environment, sub);
     }
 
-    private int get500Count() {
-        int count = 0;
-        for (final Lecture lecture : lectures) {
-            if (lecture.getNumber() >= 500 && lecture.getNumber() < 600) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     private int findTuesday1230Slot() {
         final Time time = new Time(12, 30);
         for (int i = 0; i < lectureSlots.length; i++) {
@@ -203,14 +178,10 @@ public class OrTree {
         return -1;
     }
 
-    private int findSlot(final Slot slot, final Slot[] slots) {
-        // TODO could be cached
-        for (int i = 0; i < slots.length; i++) {
-            if (slot.equals(slots[i])) {
-                return i;
-            }
-        }
-        return -1;
+    private void swap(final Object[] objects, final int i, final int j) {
+        final Object temp = objects[i];
+        objects[i] = objects[j];
+        objects[j] = temp;
     }
 
     private class State {

@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Assign {
 
-    private static final Map<String, Assign> CACHE = new ConcurrentHashMap<>();
+    private static final Map<Integer, Assign> CACHE = new ConcurrentHashMap<>();
 
     private final Course course;
 
@@ -20,7 +20,7 @@ public class Assign {
     private Time endTime;
 
     public static Assign getAssign(final Course course, final Slot slot) {
-        final String id = getCacheID(course, slot);
+        final int id = getCacheID(course, slot);
         final Assign cached = CACHE.get(id);
         if (cached != null) {
             return cached;
@@ -30,8 +30,8 @@ public class Assign {
         return newAssign;
     }
 
-    private static String getCacheID(final Course course, final Slot slot) {
-        return course.toString() + slot.getSlotID();
+    private static int getCacheID(final Course course, final Slot slot) {
+        return (course.isLecture() ? 1000000 : 0) + course.getID() * 1000 + slot.getSlotID();
     }
 
     private Assign(final Course course, final Slot slot) {

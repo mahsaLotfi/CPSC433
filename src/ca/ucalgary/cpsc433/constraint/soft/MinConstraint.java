@@ -20,8 +20,6 @@ public class MinConstraint extends SoftConstraint {
         final int pLecture = loadPenalty("pLec");
         final int wMin = loadPenalty("wMin");
 
-        System.out.printf("%d, %d, %d\n", pLab, pLecture, wMin);
-
         if (pLab >= 0) {
             penaltyLab = pLab;
         } else {

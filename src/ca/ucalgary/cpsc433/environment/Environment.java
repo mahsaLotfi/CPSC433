@@ -5,6 +5,7 @@ import ca.ucalgary.cpsc433.constraint.hard.CPSC913Constraint;
 import ca.ucalgary.cpsc433.constraint.hard.FifthYearConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.HardConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.MaxConstraint;
+import ca.ucalgary.cpsc433.constraint.hard.PartialAssignmentConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.TuesdayElevenConstraint;
 import ca.ucalgary.cpsc433.constraint.soft.MinConstraint;
 import ca.ucalgary.cpsc433.constraint.soft.SoftConstraint;
@@ -72,7 +73,7 @@ public class Environment {
     static {
         final List<HardConstraint> hard = new ArrayList<>();
         hard.add(new MaxConstraint());
-        
+        hard.add(new PartialAssignmentConstraint());
         hard.add(new FifthYearConstraint());
         hard.add(new TuesdayElevenConstraint());
         hard.add(new CPSC813Constraint());
