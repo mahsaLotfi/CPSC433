@@ -1,4 +1,4 @@
-package ca.ucalgary.cpsc433;
+package ca.ucalgary.cpsc433.set;
 
 
 import java.util.Random;
