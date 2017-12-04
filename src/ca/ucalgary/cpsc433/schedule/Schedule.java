@@ -109,8 +109,8 @@ public class Schedule implements Comparable<Schedule> {
         final SoftConstraint[] softConstraints = environment.getSoftConstraints();
 
         for (final SoftConstraint constraint : softConstraints) {
-            final int violations = constraint.getViolations(this);
-            evaluation += (violations * constraint.getPenalty() * constraint.getWeight());
+            final int penalty = constraint.getPenalty(this);
+            evaluation += (penalty * constraint.getWeight());
         }
 
         this.evaluation = evaluation;

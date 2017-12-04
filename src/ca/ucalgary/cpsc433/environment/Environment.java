@@ -5,6 +5,7 @@ import ca.ucalgary.cpsc433.constraint.hard.CPSC913Constraint;
 import ca.ucalgary.cpsc433.constraint.hard.HardConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.MaxConstraint;
 import ca.ucalgary.cpsc433.constraint.hard.TuesdayElevenConstraint;
+import ca.ucalgary.cpsc433.constraint.soft.MinConstraint;
 import ca.ucalgary.cpsc433.constraint.soft.SoftConstraint;
 import ca.ucalgary.cpsc433.schedule.Slot;
 
@@ -76,6 +77,8 @@ public class Environment {
         hard.add(new CPSC913Constraint());
 
         final List<SoftConstraint> soft = new ArrayList<>();
+
+        soft.add(new MinConstraint());
 
         HARD_CONSTRAINTS = hard.toArray(new HardConstraint[hard.size()]);
         SOFT_CONSTRAINTS = soft.toArray(new SoftConstraint[soft.size()]);

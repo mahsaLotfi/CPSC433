@@ -5,12 +5,21 @@ import ca.ucalgary.cpsc433.schedule.Schedule;
 /**
  * @author Obicere
  */
-public interface SoftConstraint {
+public abstract class SoftConstraint {
 
-    public int getViolations(final Schedule schedule);
+    public abstract int getPenalty(final Schedule schedule);
 
-    public int getPenalty();
+    public abstract int getWeight();
 
-    public int getWeight();
-
+    protected int loadPenalty(final String property) {
+        final String labPenalty = System.getProperty(property);
+        if (labPenalty != null) {
+            try {
+                return Integer.parseInt(labPenalty);
+            } catch (final NumberFormatException e) {
+                System.err.println(property + " must be an integer");
+            }
+        }
+        return -1;
+    }
 }

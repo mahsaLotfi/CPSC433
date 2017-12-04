@@ -36,32 +36,38 @@ public class Main {
 
         boolean solutionFound = true;
         long sum = 0;
-        int length = 1;
+        long evaluation = 0;
+        int length = 100;
         final Schedule[] schedules = new Schedule[length];
         for (int i = 0; i < length; i++) {
             final OrTree tree = new OrTree(environment);
 
             final long start = System.nanoTime();
             schedules[i] = tree.search();
-            sum += (System.nanoTime() - start);
 
             if (schedules[i] == null) {
                 System.out.println("No solution for schedule.");
                 solutionFound = false;
                 break;
             }
+
+            sum += (System.nanoTime() - start);
+            evaluation += schedules[i].getEvaluation();
         }
 
         if (solutionFound) {
             System.out.printf("Average time per tree: %f\n", (sum / (double) length));
+            System.out.printf("Average evaluation: %f\n", (evaluation / (double) length));
 
             final Schedule schedule = schedules[(int) (Math.random() * schedules.length)];
 
+            System.out.println();
+            System.out.println("Evaluation: " + schedule.getEvaluation());
             System.out.println("Schedule for: " + environment.getName());
 
             final Slot[] slots = environment.getSlots();
             for (final Slot slot : slots) {
-                System.out.println(slot + ", " + slot.getLectureMax() + ", " + slot.getLabMax());
+                System.out.println(slot + ", " + slot.getLectureMax() + ", " + slot.getLabMax() + ", " + slot.getLectureMin() + ", " + slot.getLabMin());
                 final Course[] courses = schedule.getCourses(slot);
 
                 for (final Course course : courses) {
