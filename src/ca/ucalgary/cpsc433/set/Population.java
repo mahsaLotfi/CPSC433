@@ -84,7 +84,10 @@ public class Population {
         	}
         	else break;
         }
-        Schedule parent1 = fittest[rand.nextInt(idx-1)];
+        Schedule parent1;
+        if (idx > 1) {
+        	parent1 = fittest[rand.nextInt(idx-1)];
+        } else parent1 = fittest[0];
         Schedule parent2 = sl.get(idx+rand.nextInt(sl.size()-idx));  // randomly chosen from the remaining individulas
         //TODO change the uniform random selection to weighted random selection
         double[] selectSeq = new double[sl.get(0).size()];
@@ -140,6 +143,7 @@ public class Population {
             }
             
             Schedule base = sl.get(idx+rand.nextInt(sl.size()-idx));
+            Assign[] baseAssigns = base.getAssigns();
             Assign[] chromosome = new Assign[sl.get(0).size()];
             for (int i=0;i<base.size();++i) {
             	Assign[] a = base.getAssigns();
@@ -147,6 +151,8 @@ public class Population {
             			env.getSlots()[(int) Math.floor(r2*env.getSlotCount())]);
             	if ((new Schedule(env, a)).isValid()) {
             		chromosome[i] = Assign.getAssign(a[i].getCourse(),a[i].getSlot());
+            	} else {
+            		chromosome[i] = Assign.getAssign(baseAssigns[i].getCourse(),baseAssigns[i].getSlot());
             	}
             }
             Schedule child = new Schedule(env, chromosome);
