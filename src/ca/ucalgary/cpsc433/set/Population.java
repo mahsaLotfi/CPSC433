@@ -168,5 +168,9 @@ public class Population {
         return generation;
     }
 
+	public Schedule getLeastFit() {
+		return leastFit;
+	}
+
 
 }
