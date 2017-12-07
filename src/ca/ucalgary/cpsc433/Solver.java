@@ -2,6 +2,7 @@ package ca.ucalgary.cpsc433;
 
 import ca.ucalgary.cpsc433.environment.Environment;
 import ca.ucalgary.cpsc433.schedule.Schedule;
+import ca.ucalgary.cpsc433.set.Population;
 import ca.ucalgary.cpsc433.tree.OrTree;
 
 import java.util.PriorityQueue;
@@ -53,6 +54,7 @@ public class Solver implements Runnable {
         System.out.println("Best schedule evaluation so far: " + bestEval);
 
         // INITIALIZE THE POPULATION HERE
+        Population culture = new Population(1000,environment);
         // MAKE USE OF THE SortedList(PriorityQueue) CONSTRUCTOR
         // USE setmin AND setmax FOR THE LIMITS OF THE POPULATION
 

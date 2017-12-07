@@ -54,13 +54,15 @@ public class SetMain {
             }
             
             int gens = 1000;
+            
             while (culture.getGeneration()<gens) {   
                 if (Thread.interrupted()) {                                 
                     break;                                                  
                 }
-                //culture.mutate(10, environment.getCourseCount()/10);
+                culture.mutate(10, environment.getCourseCount()/10);
                 culture.crossover();
             }
+            
 
             System.out.println("Final fitness:" + culture.getFittest().getFitness());
             Schedule schedule = culture.getFittest().getSchedule();
