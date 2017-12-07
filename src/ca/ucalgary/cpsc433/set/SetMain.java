@@ -50,7 +50,7 @@ public class SetMain {
         if (solutionFound) {
             Population culture = new Population(1000, environment);
             for (Schedule s : schedules) {
-                culture.add(new Individual(s, s.getEvaluation()));
+                culture.add(s);
             }
             
             int gens = 1000;
@@ -59,13 +59,13 @@ public class SetMain {
                 if (Thread.interrupted()) {                                 
                     break;                                                  
                 }
-                culture.mutate(10, environment.getCourseCount()/10);
+                culture.mutate(0.9);
                 culture.crossover();
             }
             
 
-            System.out.println("Final fitness:" + culture.getFittest().getFitness());
-            Schedule schedule = culture.getFittest().getSchedule();
+            System.out.println("Final fitness:" + culture.getFittest().getEvaluation());
+            Schedule schedule = culture.getFittest();
             final Slot[] slots = environment.getSlots();
             for (final Slot slot : slots) {
                 System.out.println(slot);
