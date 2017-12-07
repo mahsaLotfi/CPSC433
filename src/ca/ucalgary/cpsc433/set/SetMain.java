@@ -33,7 +33,7 @@ public class SetMain {
 
         boolean solutionFound = true;
 
-        int length = 10;
+        int length = 100;
         final Schedule[] schedules = new Schedule[length];
         for (int i = 0; i < length; i++) {
             final OrTree tree = new OrTree(environment);
@@ -53,18 +53,18 @@ public class SetMain {
                 culture.add(s);
             }
             
-            int gens = 1000;
+            int gens = 10000;
             
             while (culture.getGeneration()<gens) {   
                 if (Thread.interrupted()) {                                 
                     break;                                                  
                 }
-                culture.mutate(0.9);
+                culture.mutate(0.95);
                 culture.crossover();
             }
             
 
-            System.out.println("Final fitness:" + culture.getFittest().getEvaluation());
+           
             Schedule schedule = culture.getFittest();
             final Slot[] slots = environment.getSlots();
             for (final Slot slot : slots) {
@@ -76,6 +76,8 @@ public class SetMain {
                 }
                 System.out.println();
             }
+            System.out.println("Final best fitness:" + culture.getFittest().getEvaluation());
+            System.out.println("Final worst fitness:" + culture.getLeastFit().getEvaluation());
 
         }
 
