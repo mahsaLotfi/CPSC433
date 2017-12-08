@@ -1,7 +1,9 @@
 package ca.ucalgary.cpsc433.schedule;
 
 /**
- * @author Obicere
+ * Days that occur within the schedule.
+ * Monday implies Wednesday and Friday as well for Lectures
+ * Tuesday implies Thursday as well for lectures
  */
 public enum Day {
 
