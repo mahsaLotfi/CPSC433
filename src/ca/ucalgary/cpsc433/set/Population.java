@@ -4,7 +4,6 @@ package ca.ucalgary.cpsc433.set;
 import ca.ucalgary.cpsc433.environment.Environment;
 import ca.ucalgary.cpsc433.schedule.Assign;
 import ca.ucalgary.cpsc433.schedule.Schedule;
-import ca.ucalgary.cpsc433.schedule.Slot;
 import ca.ucalgary.cpsc433.util.SortedList;
 
 import java.util.Iterator;
@@ -25,7 +24,7 @@ public class Population {
     	this.maxSize = maxSize;
         rand = new Random();
         env = e;
-        sl = new SortedList<Schedule>(maxSize, new ScheduleComparator());
+        sl = new SortedList<>(maxSize);
         generation = 0;
     }
 
