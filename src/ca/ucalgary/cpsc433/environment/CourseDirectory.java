@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * CourseDirectory.
+ * 
  * @author Obicere
  */
 public class CourseDirectory {
@@ -22,6 +24,10 @@ public class CourseDirectory {
 
     private final Map<String, Lab[]> idToLabs;
 
+    /**
+     * Constructor to initialize courses, lectures and labs.
+     * @param environment
+     */
     public CourseDirectory(final Environment environment) {
         if (environment == null) {
             throw new NullPointerException("environment must be non-null");
@@ -68,6 +74,12 @@ public class CourseDirectory {
         return newMap;
     }
 
+    /**
+     * Courses getter.
+     * @param type
+     * @param number
+     * @return Course[]
+     */
     public Course[] getCourses(final String type, final int number) {
         if (type == null) {
             throw new NullPointerException("type must be non-null");
@@ -79,6 +91,12 @@ public class CourseDirectory {
         return courses.clone();
     }
 
+    /**
+     * Lecture getter.
+     * @param type
+     * @param number
+     * @return Lecture[]
+     */
     public Lecture[] getLectures(final String type, final int number) {
         if (type == null) {
             throw new NullPointerException("type must be non-null");
@@ -90,6 +108,12 @@ public class CourseDirectory {
         return lectures.clone();
     }
 
+    /**
+     * labs getter
+     * @param type
+     * @param number
+     * @return Lab[]
+     */
     public Lab[] getLabs(final String type, final int number) {
         if (type == null) {
             throw new NullPointerException("type must be non-null");
@@ -101,10 +125,21 @@ public class CourseDirectory {
         return labs.clone();
     }
 
+    /**
+     * ID getter with Course argument
+     * @param course
+     * @return
+     */
     private String getID(final Course course) {
         return getID(course.getType(), course.getNumber());
     }
 
+    /**
+     * ID getter for type and number arguments
+     * @param type
+     * @param number
+     * @return
+     */
     private String getID(final String type, final int number) {
         return type + number;
     }
