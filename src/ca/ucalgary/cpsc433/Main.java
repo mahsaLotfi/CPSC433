@@ -10,7 +10,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Obicere
@@ -42,25 +41,16 @@ public class Main {
             return;
         }
 
-        final int timeout = getProperty("timeout", 15);
-        final long timeoutms = TimeUnit.MILLISECONDS.convert(timeout, TimeUnit.MINUTES);
-
         final Solver solver = new Solver(environment);
-
         final Thread thread = new Thread(solver);
 
         final long start = System.currentTimeMillis();
-        thread.start();
 
+        thread.start();
         try {
-            if (timeoutms > 0) {
-                Thread.sleep(timeoutms);
-                thread.interrupt();
-            }
             thread.join();
         } catch (final InterruptedException e) {
-            System.err.println("Main thread interrupted. Terminating abruptly.");
-            return;
+            e.printStackTrace();
         }
 
         final long end = System.currentTimeMillis() - start;

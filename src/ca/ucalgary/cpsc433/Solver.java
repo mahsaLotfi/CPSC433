@@ -6,8 +6,17 @@ import ca.ucalgary.cpsc433.set.Population;
 import ca.ucalgary.cpsc433.tree.OrTree;
 
 import java.util.PriorityQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
+ * A process used to solve the course scheduling problem described by the
+ * environment instance. This will utilize an Or-Tree to create an initial
+ * population. A genetic algorithm is then applied on the population, to
+ * try and optimize the random results generated from the tree.
+ * <p>
+ * This can be controlled through a number of generations, a specific goal
+ * or through a timeout.
+ *
  * @author Obicere
  */
 public class Solver implements Runnable {
@@ -26,6 +35,15 @@ public class Solver implements Runnable {
 
     private final int goal;
 
+    private final long timeout;
+
+    /**
+     * Initializes the solver. Makes use of the <code>timeout</code>,
+     * <code>setinit</code>, <code>setmin</code>, <code>setmax</code>,
+     * <code>gens</code> and <code>goal</code> settings.
+     *
+     * @param environment The environment describing the problem to solve.
+     */
     public Solver(final Environment environment) {
         if (environment == null) {
             throw new NullPointerException("environment must be non-null");
@@ -37,12 +55,16 @@ public class Solver implements Runnable {
         this.setmax = Main.getProperty("setmax", 100000);
         this.gens = Main.getProperty("gens", -1);
         this.goal = Main.getProperty("goal", 0);
+
+        final int timeoutS = Main.getProperty("timeout", 15);
+        this.timeout = TimeUnit.MILLISECONDS.convert(timeoutS, TimeUnit.MINUTES);
     }
 
     @Override
     public void run() {
-        final PriorityQueue<Schedule> schedules = initSchedules();
+        long start = System.currentTimeMillis();
 
+        final PriorityQueue<Schedule> schedules = initSchedules();
         if (schedules == null) {
             System.out.println("Instance has no solution.");
             return;
@@ -52,11 +74,14 @@ public class Solver implements Runnable {
         int bestEval = schedules.peek().getEvaluation();
 
         // INITIALIZE THE POPULATION HERE
-        Population culture = new Population(1000,environment);
+        Population culture = new Population(1000, environment);
         // MAKE USE OF THE SortedList(PriorityQueue) CONSTRUCTOR
         // USE setmin AND setmax FOR THE LIMITS OF THE POPULATION
 
         while ((gens < 0 || generations < gens) && bestEval > goal) {
+            if (System.currentTimeMillis() > start + timeout) {
+                break;
+            }
             if (Thread.interrupted()) {
                 break;
             }
@@ -64,18 +89,32 @@ public class Solver implements Runnable {
             // ADD YOUR SINGLE OPERATION HERE
 
             // UPDATE THE BEST EVALUATION HERE
-            // bestEval = schedules.peek().getEvaluation();
             generations++;
         }
 
         solution = schedules.poll();
     }
 
+    /**
+     * Retrieves the solution. If no solution is found, this will be
+     * <code>null</code>. Otherwise, the best solution is retrieved.
+     *
+     * @return The best solution, if there is one possible.
+     * <code>null</code> otherwise.
+     */
     public Schedule getSolution() {
         return solution;
     }
 
+    /**
+     * Generates the initial population. Adheres to the timeout requested
+     * in the properties. Will generate <code>setinit</code> schedules.
+     *
+     * @return An order heap of all the schedules. <code>null</code> if no
+     * solution is possible.
+     */
     private PriorityQueue<Schedule> initSchedules() {
+        long start = System.currentTimeMillis();
         final OrTree solver = new OrTree(environment);
         final Schedule first = solver.search();
 
@@ -87,12 +126,18 @@ public class Solver implements Runnable {
         schedules.add(first);
 
         for (int i = 1; i < setinit; i++) {
+            if (System.currentTimeMillis() > start + timeout) {
+                break;
+            }
+
             final Schedule next = solver.search();
             if (next == null) {
                 throw new AssertionError("Schedule should not be null. Error with tree.");
             }
             schedules.add(next);
         }
+
+        solution = schedules.peek();
         return schedules;
     }
 }
