@@ -5,8 +5,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A course is assigned to a Slot, which has a day and time associated with it. It has a min/max number
- * of lectures/labs that can be assigned to it. 
+ * A course is assigned to a Slot, which has a day and time associated with
+ * it. It has a min/max number
+ * of lectures/labs that can be assigned to it.
  */
 public class Slot implements Comparable<Slot> {
 
@@ -28,14 +29,12 @@ public class Slot implements Comparable<Slot> {
 
     private int labMin = 0;
 
-    private boolean lectureInit = false;
-
-    private boolean labInit = false;
-
     /**
-     * Retrieves the slot for a specific day and time, returning the slots contents if a course has
+     * Retrieves the slot for a specific day and time, returning the slots
+     * contents if a course has
      * been assigned there
-     * @param day When the slot is during the week
+     *
+     * @param day  When the slot is during the week
      * @param time Start time of the slot
      * @return slot of the specified day and time
      */
@@ -52,7 +51,8 @@ public class Slot implements Comparable<Slot> {
 
     /**
      * Checks whether a specified Slot exists
-     * @param day When the slot takes place
+     *
+     * @param day  When the slot takes place
      * @param time starting time of the slot
      * @return true if the slot exists
      */
@@ -71,6 +71,7 @@ public class Slot implements Comparable<Slot> {
 
     /**
      * Retrieves all the slots that have been created
+     *
      * @return array of slots
      */
     public static Slot[] getSlots() {
@@ -83,9 +84,11 @@ public class Slot implements Comparable<Slot> {
     }
 
     /**
-     * Retrieves the cache ID of the specified slot based of its day, hour, and minutes
-     * @param day when the slot takes place
-     * @param time start time 
+     * Retrieves the cache ID of the specified slot based of its day, hour,
+     * and minutes
+     *
+     * @param day  when the slot takes place
+     * @param time start time
      * @return cache ID
      */
     private static int getCacheID(final Day day, final Time time) {
@@ -93,8 +96,9 @@ public class Slot implements Comparable<Slot> {
     }
 
     /**
-     * Constructor that initializes the day and time of a slot, 
+     * Constructor that initializes the day and time of a slot,
      * adding it to the list and increasing the slot count
+     *
      * @param day
      * @param time
      */
@@ -162,33 +166,28 @@ public class Slot implements Comparable<Slot> {
     }
 
     /**
-     * Sets the number of courses that the slot can have assigned for a maximum and a
+     * Sets the number of courses that the slot can have assigned for a
+     * maximum and a
      * minimum value
+     *
      * @param min minimum number of Lectures for the Slot
      * @param max maximum number of Lectures for the Slot
      */
     public void setLectureLimit(final int min, final int max) {
-        if (lectureInit) {
-            return;
-        }
         this.lectureMax = max;
         this.lectureMin = min;
-        this.lectureInit = true;
     }
 
     /**
-     * Sets the minimum and maximum number of labs that can be 
+     * Sets the minimum and maximum number of labs that can be
      * scheduled in a slot
+     *
      * @param min minimum number of labs
      * @param max maximum number of labs
      */
     public void setLabLimit(final int min, final int max) {
-        if (labInit) {
-            return;
-        }
         this.labMax = max;
         this.labMin = min;
-        this.labInit = true;
     }
 
     /**
@@ -228,6 +227,7 @@ public class Slot implements Comparable<Slot> {
 
     /**
      * Compares two Slots
+     *
      * @param o Slot to be compared to
      * @return an int value depeding if it is > , <, =.
      */
