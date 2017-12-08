@@ -72,6 +72,9 @@ public class OrTree {
                 swap(lectures, i, j);
                 j++;
             }
+            if(lectures[i].getNumber() == 313 || lectures[i].getNumber() == 313) {
+
+            }
         }
         // evening, unwanted and 5XX lectures have second priority
         for (int i = 0; i < lectures.length; i++) {

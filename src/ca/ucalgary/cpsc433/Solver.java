@@ -73,11 +73,7 @@ public class Solver implements Runnable {
         int generations = 0;
         int bestEval = schedules.peek().getEvaluation();
 
-        // INITIALIZE THE POPULATION HERE
-        Population culture = new Population(1000, environment);
-        // MAKE USE OF THE SortedList(PriorityQueue) CONSTRUCTOR
-        // USE setmin AND setmax FOR THE LIMITS OF THE POPULATION
-
+        Population culture = new Population(setmin, setmax, environment, schedules);
         while ((gens < 0 || generations < gens) && bestEval > goal) {
             if (System.currentTimeMillis() > start + timeout) {
                 break;
@@ -86,13 +82,13 @@ public class Solver implements Runnable {
                 break;
             }
 
-            // ADD YOUR SINGLE OPERATION HERE
+            culture.operate();
 
-            // UPDATE THE BEST EVALUATION HERE
+            bestEval = culture.getFittest().getEvaluation();
             generations++;
         }
 
-        solution = schedules.poll();
+        solution = culture.getFittest();
     }
 
     /**

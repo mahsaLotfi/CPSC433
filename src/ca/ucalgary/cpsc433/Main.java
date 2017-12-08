@@ -22,7 +22,7 @@ public class Main {
         }
 
         try {
-            final FileInputStream stream = new FileInputStream("resources/config.properties");
+            final FileInputStream stream = new FileInputStream("config.properties");
 
             final Properties properties = new Properties(System.getProperties());
 
@@ -58,13 +58,13 @@ public class Main {
         final long seconds = (end % 60000) / 1000;
         final long milliseconds = (end % 1000);
 
-        System.out.printf("Done in %d:%02d:%03d%n%n", minutes, seconds, milliseconds);
+        // System.out.printf("Done in %d:%02d:%03d%n%n", minutes, seconds, milliseconds);
 
         final Schedule solution = solver.getSolution();
 
         if (solution != null) {
             System.out.println("Evaluation: " + solution.getEvaluation());
-
+            System.out.println(environment.getName());
             final Slot[] slots = environment.getSlots();
             Arrays.sort(slots);
 
