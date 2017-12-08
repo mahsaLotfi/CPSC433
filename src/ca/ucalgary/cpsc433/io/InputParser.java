@@ -170,28 +170,22 @@ public class InputParser {
     }
 
     private Environment getEnvironment() {
-    	final List<Lecture> cpsc313 = getLectures("CPSC", 313, -1);
-    	final List<Lecture> cpsc413 = getLectures("CPSC", 413, -1);
-    	final List<Lecture> cpsc813 = getLectures("CPSC", 813, -1);
-    	final List<Lecture> cpsc913 = getLectures("CPSC", 913, -1);
-    	if (!cpsc313.isEmpty() && cpsc813.isEmpty()) {
-    		final Lecture newLecture = Lecture.getLecture("CPSC", 813, 1);
-    		newLecture.setLabs(new Lab[0]);
-    		for (final Lecture c3 : cpsc313) {
-    			notCompatibles.add(new NotCompatible(c3, newLecture));
-    		}
-    		Slot.getSlot(Day.TUESDAY, new Time(18, 0));
-    	}
-    	if (!cpsc413.isEmpty() && cpsc913.isEmpty()) {
-    		final Lecture newLecture = Lecture.getLecture("CPSC", 913, 1);
-    		newLecture.setLabs(new Lab[0]);
-    		for (final Lecture c4 : cpsc413) {
-    			notCompatibles.add(new NotCompatible(c4, newLecture));
-    		}
-    		Slot.getSlot(Day.TUESDAY, new Time(18, 0));
-    	}
-    	
-    	
+        final List<Lecture> cpsc313 = getLectures("CPSC", 313, -1);
+        final List<Lecture> cpsc413 = getLectures("CPSC", 413, -1);
+        final List<Lecture> cpsc813 = getLectures("CPSC", 813, -1);
+        final List<Lecture> cpsc913 = getLectures("CPSC", 913, -1);
+        if (!cpsc313.isEmpty() && cpsc813.isEmpty()) {
+            final Lecture newLecture = Lecture.getLecture("CPSC", 813, 1);
+            newLecture.setLabs(new Lab[0]);
+            Slot.getSlot(Day.TUESDAY, new Time(18, 0));
+        }
+        if (!cpsc413.isEmpty() && cpsc913.isEmpty()) {
+            final Lecture newLecture = Lecture.getLecture("CPSC", 913, 1);
+            newLecture.setLabs(new Lab[0]);
+            Slot.getSlot(Day.TUESDAY, new Time(18, 0));
+        }
+
+
         final Slot[] newLectureSlots = lectureSlots.toArray(new Slot[lectureSlots.size()]);
         final Slot[] newLabSlots = labSlots.toArray(new Slot[labSlots.size()]);
         final NotCompatible[] newNotCompatibles = notCompatibles.toArray(new NotCompatible[notCompatibles.size()]);

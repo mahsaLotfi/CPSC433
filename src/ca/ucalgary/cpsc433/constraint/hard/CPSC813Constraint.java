@@ -48,8 +48,11 @@ public class CPSC813Constraint implements HardConstraint {
         }
         for (final Lecture lecture : cpsc813) {
             final Assign assign = schedule.getAssign(lecture);
+            if (assign == null) {
+                continue;
+            }
             final Slot assigned = assign.getSlot();
-            if (!assigned.equals(target)) {
+            if (!assigned.equals(target)){
                 return false;
             }
             for (int i = 0; i < nonCompatibles.length; i++) {
@@ -69,24 +72,24 @@ public class CPSC813Constraint implements HardConstraint {
     private void initialize(final Environment environment) {
         initialized = true;
 
-        final Time time = new Time(18, 0);
-        if (!Slot.exists(Day.TUESDAY, time)) {
-            return;
-        }
-        target = Slot.getSlot(Day.TUESDAY, new Time(18, 0));
-
         final Lecture[] lectures = environment.getLectures("CPSC", 813);
         if (lectures.length == 0) {
             return;
         }
         this.cpsc813 = lectures;
 
+        final Time time = new Time(18, 0);
+        if (!Slot.exists(Day.TUESDAY, time)) {
+            return;
+        }
+        target = Slot.getSlot(Day.TUESDAY, new Time(18, 0));
+
         final Set<Course> courses = new LinkedHashSet<>();
 
-        final Course[] cpsc313 = environment.getCourses("CPSC", 313);
-        Collections.addAll(courses, cpsc313);
+        final Course[] cpsc413 = environment.getCourses("CPSC", 313);
+        Collections.addAll(courses, cpsc413);
 
-        for (final Course lecture : cpsc313) {
+        for (final Course lecture : cpsc413) {
             final Course[] nonCompatible = environment.getNonCompatibles(lecture);
             Collections.addAll(courses, nonCompatible);
         }
@@ -102,6 +105,6 @@ public class CPSC813Constraint implements HardConstraint {
      * @return true if cpsc813 exits and nonCompatibles/target are not null
      */
     private boolean canBeEnforced() {
-        return target != null && cpsc813 != null && nonCompatibles != null;
+        return cpsc813 != null || (target != null && nonCompatibles != null);
     }
 }

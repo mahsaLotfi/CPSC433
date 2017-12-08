@@ -68,7 +68,7 @@ public class Main {
         final long seconds = (end % 60000) / 1000;
         final long milliseconds = (end % 1000);
 
-        System.out.printf("Done in %d:%02d:%03d%n%n", minutes, seconds, milliseconds);
+        // System.out.printf("Done in %d:%02d:%03d%n%n", minutes, seconds, milliseconds);
 
         final Schedule solution = solver.getSolution();
 

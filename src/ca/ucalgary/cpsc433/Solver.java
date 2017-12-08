@@ -51,8 +51,6 @@ public class Solver implements Runnable {
         int generations = 0;
         int bestEval = schedules.peek().getEvaluation();
 
-        System.out.println("Best schedule evaluation so far: " + bestEval);
-
         // INITIALIZE THE POPULATION HERE
         Population culture = new Population(1000,environment);
         // MAKE USE OF THE SortedList(PriorityQueue) CONSTRUCTOR
