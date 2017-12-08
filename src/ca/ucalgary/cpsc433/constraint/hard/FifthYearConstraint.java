@@ -9,12 +9,21 @@ import ca.ucalgary.cpsc433.schedule.Slot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Hard Constraint that all 500-level courses have to be scheduled into different
+ * time slots
+ *
+ */
 public class FifthYearConstraint implements HardConstraint {
     private boolean initialized = false;
     private Lecture[] fivehundred;
 
 
-    @Override
+    /**
+     * Checks whether a schedule meets the hard constraint
+     * @param schedule the schedule to be checked
+     * @return true if all fifth year courses are scheduled at different times
+     */
     public boolean isSatisfied(final Schedule schedule) {
 
         if (!initialized) {
@@ -36,7 +45,11 @@ public class FifthYearConstraint implements HardConstraint {
         }
         return true;
     }
-
+    
+    /**
+     * Initializes an array of all the 500 level courses
+     * @param environment obtains all the courses from the environment
+     */
     private void initialize(final Environment environment) {
         initialized = true;
 

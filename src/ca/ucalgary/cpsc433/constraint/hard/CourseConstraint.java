@@ -7,11 +7,15 @@ import ca.ucalgary.cpsc433.schedule.Schedule;
 import ca.ucalgary.cpsc433.schedule.Slot;
 
 /**
- * @author Obicere
+ * Hard Constraint that a course and its labs are all scheduled at different times
  */
 public class CourseConstraint implements HardConstraint {
 
-    @Override
+    /**
+     * Checks the schedule to see if the constraint is satisfied
+     * @param schedule current schedule being checked
+     * @return true if all courses and subsequent lab sections are at different times
+     */
     public boolean isSatisfied(final Schedule schedule) {
         final Lecture[] lectures = schedule.getEnvironment().getLectures();
 

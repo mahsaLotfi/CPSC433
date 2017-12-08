@@ -12,7 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * @author Obicere
+ * Hard Constraint that checks the list of not-compatible(a,b) statements to make sure
+ * that assign(a) does not equal assign(b).
  */
 public class NotCompatibleConstraint implements HardConstraint {
 
@@ -20,7 +21,11 @@ public class NotCompatibleConstraint implements HardConstraint {
 
     private boolean initialized = false;
 
-    @Override
+    /**
+     * Checks if a certain schedule satisfies the hard constraint
+     * @param schedule current schedule to be checked
+     * @return true if assign(a) != assign(b)
+     */
     public boolean isSatisfied(final Schedule schedule) {
         if (!initialized) {
             initialize(schedule.getEnvironment());
@@ -52,6 +57,10 @@ public class NotCompatibleConstraint implements HardConstraint {
         return true;
     }
 
+    /**
+     * Initializes a list of lists of non compatible courses
+     * @param environment used to obtain all the non-compatible courses
+     */
     private void initialize(final Environment environment) {
         initialized = true;
 

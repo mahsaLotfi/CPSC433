@@ -14,7 +14,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * @author Obicere
+ * Hard Constraint for CPSC 813 that is scheduled Tu/Th 1800-1900 and not
+ * allowed to overlap with any labs/tutorials of cpsc313 or course sections
+ * of cpsc313 and transitively with any other courses that are not allowed to overlap
+ * with cpsc313
  */
 public class CPSC813Constraint implements HardConstraint {
 
@@ -26,7 +29,11 @@ public class CPSC813Constraint implements HardConstraint {
 
     private Course[] nonCompatibles;
 
-    @Override
+    /**
+     * Checks if the hard constraint is satisfied
+     * @param schedule current schedule being checked
+     * @return true if there are no conflicts with cpsc813
+     */
     public boolean isSatisfied(final Schedule schedule) {
         if (!initialized) {
             initialize(schedule.getEnvironment());
@@ -55,6 +62,10 @@ public class CPSC813Constraint implements HardConstraint {
         return true;
     }
 
+    /**
+     * Creates an array of courses that are not compatible with cpsc813
+     * @param environment that the lectures are obtained from
+     */
     private void initialize(final Environment environment) {
         initialized = true;
 
@@ -86,6 +97,10 @@ public class CPSC813Constraint implements HardConstraint {
         nonCompatibles = courses.toArray(new Course[courses.size()]);
     }
 
+    /**
+     * Determines whether the constraint can be enforced or not
+     * @return true if cpsc813 exits and nonCompatibles/target are not null
+     */
     private boolean canBeEnforced() {
         return target != null && cpsc813 != null && nonCompatibles != null;
     }

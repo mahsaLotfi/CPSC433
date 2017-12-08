@@ -8,10 +8,16 @@ import ca.ucalgary.cpsc433.schedule.Schedule;
 import ca.ucalgary.cpsc433.schedule.Slot;
 
 /**
- * @author Obicere
+ * Hard Constraint that checks the list of unwanted(a,s) statements, where assign(a) can
+ * not be equal to Slot s.
  */
 public class UnwantedConstraint implements HardConstraint {
-    @Override
+    
+	/**
+	 * Checks the current schedule and compares to the list of unwanted statements
+	 * @param schedule the current schedule to be checked
+	 * @return true if assign(a) != s
+	 */
     public boolean isSatisfied(final Schedule schedule) {
         final Environment environment = schedule.getEnvironment();
         if (!environment.hasUnwanted()) {

@@ -10,7 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * @author Obicere
+ * Hard Constraint that compares the partial assignment condition,
+ * assign(a) = partassign(a) 
  */
 public class PartialAssignmentConstraint implements HardConstraint {
 
@@ -18,7 +19,11 @@ public class PartialAssignmentConstraint implements HardConstraint {
 
     private List<PartialAssign> partialCourses;
 
-    @Override
+    /**
+     * Checks whether the hard constraint is satisfied or not
+     * @param schedule current schedule to be checked
+     * @return true if partassign(a) = assign(a)
+     */
     public boolean isSatisfied(final Schedule schedule) {
         if (!initialized) {
             initialize(schedule.getEnvironment());
@@ -35,7 +40,11 @@ public class PartialAssignmentConstraint implements HardConstraint {
         }
         return true;
     }
-
+    
+    /**
+     * Initializes a list of partialCourses from the environment
+     * @param environment partialCourses extracted from here
+     */
     private void initialize(final Environment environment) {
         initialized = true;
 

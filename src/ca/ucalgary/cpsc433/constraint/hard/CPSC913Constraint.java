@@ -14,7 +14,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * @author Obicere
+ * Hard Constraint for CPSC 913 that is scheduled Tu/Th 1800-1900 and not
+ * allowed to overlap with any labs/tutorials of cpsc313 or course sections
+ * of cpsc413 and transitively with any other courses that are not allowed to overlap
+ * with cpsc413
  */
 public class CPSC913Constraint implements HardConstraint {
 
@@ -26,7 +29,11 @@ public class CPSC913Constraint implements HardConstraint {
 
     private Course[] nonCompatibles;
 
-    @Override
+    /**
+     * Checks if the hard constraint is satisfied
+     * @param schedule current schedule being checked
+     * @return true if there are no conflicts with cpsc913
+     */
     public boolean isSatisfied(final Schedule schedule) {
         if (!initialized) {
             initialize(schedule.getEnvironment());
@@ -41,9 +48,12 @@ public class CPSC913Constraint implements HardConstraint {
         }
         for (final Lecture lecture : cpsc913) {
             final Assign assign = schedule.getAssign(lecture);
+            if (assign == null) {
+                continue;
+            }
             final Slot assigned = assign.getSlot();
-            if (!assigned.equals(target)) {
-                return false;
+            if (!assigned.equals(target)){
+            	return false;
             }
             for (int i = 0; i < nonCompatibles.length; i++) {
                 if (assigns[i] != null && assigns[i].collides(assign)) {
@@ -55,20 +65,24 @@ public class CPSC913Constraint implements HardConstraint {
         return true;
     }
 
+    /**
+     * Creates an array of courses that are not compatible with cpsc913
+     * @param environment that the lectures are obtained from
+     */
     private void initialize(final Environment environment) {
         initialized = true;
-
-        final Time time = new Time(18, 0);
-        if (!Slot.exists(Day.TUESDAY, time)) {
-            return;
-        }
-        target = Slot.getSlot(Day.TUESDAY, new Time(18, 0));
 
         final Lecture[] lectures = environment.getLectures("CPSC", 913);
         if (lectures.length == 0) {
             return;
         }
         this.cpsc913 = lectures;
+        
+        final Time time = new Time(18, 0);
+        if (!Slot.exists(Day.TUESDAY, time)) {
+            return;
+        }
+        target = Slot.getSlot(Day.TUESDAY, new Time(18, 0));
 
         final Set<Course> courses = new LinkedHashSet<>();
 
@@ -86,7 +100,11 @@ public class CPSC913Constraint implements HardConstraint {
         nonCompatibles = courses.toArray(new Course[courses.size()]);
     }
 
+    /**
+     * Determines whether the constraint can be enforced or not
+     * @return true if cpsc913 exits and nonCompatibles/target are not null
+     */
     private boolean canBeEnforced() {
-        return target != null && cpsc913 != null && nonCompatibles != null;
+        return cpsc913 != null || (target != null && nonCompatibles != null);
     }
 }

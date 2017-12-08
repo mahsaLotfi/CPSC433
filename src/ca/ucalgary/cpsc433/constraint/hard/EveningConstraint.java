@@ -7,12 +7,19 @@ import ca.ucalgary.cpsc433.schedule.Schedule;
 
 import java.util.ArrayList;
 
-
+/**
+ * Hard Constraint that all evening classes are in evening slots, represented
+ * with a section number greater than or equal to 90
+ *
+ */
 public class EveningConstraint implements HardConstraint {
     private boolean initialized = false;
     private ArrayList<Course> evening;
 
-
+    /**
+     * @param schedule The current schedule to be checked
+     * @return true if satisfied if all evening courses are in evening slots
+     */
     public boolean isSatisfied(final Schedule schedule) {
         if (!initialized) {
             initialize(schedule.getEnvironment());
@@ -25,7 +32,11 @@ public class EveningConstraint implements HardConstraint {
         }
         return true;
     }
-
+    
+    /**
+     * Initializes an ArrayList of all the evening courses
+     * @param environment used to initialize the list
+     */
     private void initialize(final Environment environment) {
         initialized = true;
 
