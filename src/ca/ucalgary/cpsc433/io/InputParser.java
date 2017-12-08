@@ -25,7 +25,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Parses an input file into an environment. Requires strict form and all
+ * specifier tags must exist. Single use only.
+ *
  * @author Obicere
+ * @see InputParser#parseEnvironment(String)
  */
 public class InputParser {
 
@@ -53,10 +57,20 @@ public class InputParser {
 
     private List<PartialAssign> partialAssigns = new LinkedList<>();
 
-    public InputParser(final BufferedReader reader) {
+    private InputParser(final BufferedReader reader) {
         this.reader = reader;
     }
 
+    /**
+     * Parses the input file to form a new environment instance. The format
+     * must follow the specified format, with all specifier tags existing.
+     *
+     * @param inputFile The input file to parse.
+     * @return The new environment instance represented by this file.
+     * @throws IOException If the file does not exist, cannot be read
+     *                     from,
+     *                     or an error occurs while parsing the file.
+     */
     public static Environment parseEnvironment(final String inputFile) throws IOException {
         final File file = new File(inputFile);
         if (!file.exists()) {
@@ -70,95 +84,55 @@ public class InputParser {
 
         final InputParser parser = new InputParser(bufferedReader);
 
+        // parse the file
         parser.doParse();
 
+        // close the file
         bufferedReader.close();
 
+        // collapse the labs
         parser.assignLabs();
 
+        // ensure that CPSC 813 and 913 exist if needed.
+        parser.ensureCPSCX13Exists();
+
+        // retrieve the environment
         return parser.getEnvironment();
     }
 
+    /**
+     * Parses the entire file, until no more content is available.
+     *
+     * @throws IOException If there is an exception during parsing.
+     */
     private void doParse() throws IOException {
         String next = reader.readLine();
         if (next == null) {
             throw new IOException("Input file must be non-empty.");
         }
+        // parse the next specifier
         while (next != null) {
             next = next.trim();
+
             String line = reader.readLine();
+            // parse all the content below the specifier
             while (line != null && !line.isEmpty()) {
                 final CharBuffer buffer = new CharBuffer(line.trim());
-                switch (next) {
-                    case "Name:":
-                        this.name = parseName(buffer);
-                        break;
-                    case "Course slots:":
-                        final Slot lectureSlot = parseSlot(buffer, true);
-                        if (lectureSlot.isValidLectureSlot()) {
-                            lectureSlots.add(lectureSlot);
-                        } else {
-                            System.out.println("Warning: invalid lecture slot: " + lectureSlot);
-                        }
-                        break;
-                    case "Lab slots:":
-                        final Slot labSlot = parseSlot(buffer, false);
-                        if (labSlot.isValidLabSlot()) {
-                            labSlots.add(labSlot);
-                        } else {
-                            System.out.println("Warning: invalid lab slot: " + labSlot);
-                        }
-                        break;
-                    case "Courses:":
-                        final Lecture lecture = parseLecture(buffer);
-                        lectures.add(lecture);
-                        labAssignments.putIfAbsent(lecture, new LinkedList<>());
-                        break;
-                    case "Labs:":
-                        final Lab lab = parseLab(buffer);
-                        final Lecture[] lectures = lab.getLectures();
-                        for (final Lecture labLecture : lectures) {
-                            final List<Lab> assigns = labAssignments.get(labLecture);
-                            if (assigns == null) {
-                                throw new AssertionError("Expected a lecture assignment list to exist before lab parsing.");
-                            }
-                            assigns.add(lab);
-                        }
-                        labs.add(lab);
-                        break;
-                    case "Not compatible:":
-                        notCompatibles.add(parseNotCompatible(buffer));
-                        break;
-                    case "Unwanted:":
-                        final Unwanted unwanted = parseUnwanted(buffer);
-                        if (unwanted != null) {
-                            this.unwanted.add(unwanted);
-                        }
-                        break;
-                    case "Preferences:":
-                        final Preference preference = parsePreference(buffer);
-                        if (preference != null) {
-                            preferences.add(preference);
-                        }
-                        break;
-                    case "Pair:":
-                        pairs.add(parsePair(buffer));
-                        break;
-                    case "Partial assignments:":
-                        final PartialAssign assign = parsePartialAssign(buffer);
-                        if (assign != null) {
-                            partialAssigns.add(assign);
-                        }
-                        break;
-                    default:
-                        throw new AssertionError("Unexpected input: " + line);
-                }
+
+                parseSpecifier(next, buffer);
+
+                // next content line
                 line = reader.readLine();
             }
+            // next specifier
             next = reader.readLine();
         }
     }
 
+    /**
+     * Assigns all the labs to the lectures they belong too. A lab may be
+     * assigned to more than one lecture.
+     */
     private void assignLabs() {
         for (final Map.Entry<Lecture, List<Lab>> entry : labAssignments.entrySet()) {
             final Lecture lecture = entry.getKey();
@@ -169,7 +143,32 @@ public class InputParser {
         }
     }
 
+    /**
+     * Compacts the information into the environment.
+     *
+     * @return The new environment instance.
+     */
     private Environment getEnvironment() {
+        final Slot[] newLectureSlots = lectureSlots.toArray(new Slot[lectureSlots.size()]);
+        final Slot[] newLabSlots = labSlots.toArray(new Slot[labSlots.size()]);
+        final NotCompatible[] newNotCompatibles = notCompatibles.toArray(new NotCompatible[notCompatibles.size()]);
+        final Unwanted[] newUnwanted = unwanted.toArray(new Unwanted[unwanted.size()]);
+        final Preference[] newPreferences = preferences.toArray(new Preference[preferences.size()]);
+        final Pair[] newPairs = pairs.toArray(new Pair[pairs.size()]);
+        final PartialAssign[] newPartialAssigns = partialAssigns.toArray(new PartialAssign[partialAssigns.size()]);
+
+        return new Environment(name, newLectureSlots, newLabSlots, newNotCompatibles, newUnwanted, newPreferences, newPairs, newPartialAssigns);
+    }
+
+    /**
+     * Ensures that the CPSC 813 and 913 classes exist, if necessary. The
+     * slot at Tuesday at 18:00 is also added, with only enough lecture
+     * slots for CPSC 813 and CPSC 913 (if they exist).
+     * <p>
+     * A partial assignment is also generated for the class, to allow quick
+     * optimization.
+     */
+    private void ensureCPSCX13Exists() {
         final List<Lecture> cpsc313 = getLectures("CPSC", 313, -1);
         final List<Lecture> cpsc413 = getLectures("CPSC", 413, -1);
         final List<Lecture> cpsc813 = getLectures("CPSC", 813, -1);
@@ -193,23 +192,106 @@ public class InputParser {
             final PartialAssign assign = new PartialAssign(Assign.getAssign(newLecture, newSlot));
             partialAssigns.add(assign);
         }
-
-
-        final Slot[] newLectureSlots = lectureSlots.toArray(new Slot[lectureSlots.size()]);
-        final Slot[] newLabSlots = labSlots.toArray(new Slot[labSlots.size()]);
-        final NotCompatible[] newNotCompatibles = notCompatibles.toArray(new NotCompatible[notCompatibles.size()]);
-        final Unwanted[] newUnwanted = unwanted.toArray(new Unwanted[unwanted.size()]);
-        final Preference[] newPreferences = preferences.toArray(new Preference[preferences.size()]);
-        final Pair[] newPairs = pairs.toArray(new Pair[pairs.size()]);
-        final PartialAssign[] newPartialAssigns = partialAssigns.toArray(new PartialAssign[partialAssigns.size()]);
-
-        return new Environment(name, newLectureSlots, newLabSlots, newNotCompatibles, newUnwanted, newPreferences, newPairs, newPartialAssigns);
     }
 
-    private String parseName(final CharBuffer line) {
-        return line.nextIdentifier();
+    /**
+     * Parses the content based on the given specifier. The valid
+     * specifiers are:
+     * <ol>
+     * <li>Name:</li>
+     * <li>Course slots:</li>
+     * <li>Lab slots:</li>
+     * <li>Courses:</li>
+     * <li>Labs:</li>
+     * <li>Not compatible:</li>
+     * <li>Unwanted:</li>
+     * <li>Preferences:</li>
+     * <li>Pair:</li>
+     * <li>Partial assignments:</li>
+     * </ol>
+     *
+     * @param specifier The specifier for the content type
+     * @param buffer    The line containing the new content
+     */
+    private void parseSpecifier(final String specifier, final CharBuffer buffer) {
+        switch (specifier) {
+            case "Name:":
+                parseNameSpecifier(buffer);
+                break;
+            case "Course slots:":
+                parseLectureSlotSpecifier(buffer);
+                break;
+            case "Lab slots:":
+                parseLabSlotSpecifier(buffer);
+                break;
+            case "Courses:":
+                parseLectureSpecifier(buffer);
+                break;
+            case "Labs:":
+                parseLabSpecifier(buffer);
+                break;
+            case "Not compatible:":
+                parseNotCompatibleSpecifier(buffer);
+                break;
+            case "Unwanted:":
+                parseUnwantedSpecifier(buffer);
+                break;
+            case "Preferences:":
+                parsePreferenceSpecifier(buffer);
+                break;
+            case "Pair:":
+                parsePairSpecifier(buffer);
+                break;
+            case "Partial assignments:":
+                parsePartialAssignSpecifier(buffer);
+                break;
+            default:
+                throw new AssertionError("Unexpected input: " + buffer);
+        }
     }
 
+    /**
+     * Parses name content.
+     *
+     * @param line The content line.
+     */
+    private void parseNameSpecifier(final CharBuffer line) {
+        this.name = line.nextIdentifier();
+    }
+
+    /**
+     * Parses a new lecture slot.
+     *
+     * @param line The content line.
+     */
+    private void parseLectureSlotSpecifier(final CharBuffer line) {
+        final Slot lectureSlot = parseSlot(line, true);
+        if (lectureSlot.isValidLectureSlot()) {
+            lectureSlots.add(lectureSlot);
+        } else {
+            System.out.println("Warning: invalid lecture slot: " + lectureSlot);
+        }
+    }
+
+    /**
+     * Parses a new lab slot.
+     *
+     * @param line The content line.
+     */
+    private void parseLabSlotSpecifier(final CharBuffer line) {
+        final Slot labSlot = parseSlot(line, false);
+        if (labSlot.isValidLabSlot()) {
+            labSlots.add(labSlot);
+        } else {
+            System.out.println("Warning: invalid lab slot: " + labSlot);
+        }
+    }
+
+    /**
+     * Parses a slot.
+     *
+     * @param line The content line.
+     */
     private Slot parseSlot(final CharBuffer line, final boolean lecture) {
         final Day day = parseDay(line);
         line.skipComma();
@@ -233,6 +315,66 @@ public class InputParser {
         return slot;
     }
 
+    /**
+     * Parses a lecture.
+     *
+     * @param line The content line.
+     */
+    private void parseLectureSpecifier(final CharBuffer line) {
+        final Lecture lecture = parseLecture(line);
+        lectures.add(lecture);
+        labAssignments.putIfAbsent(lecture, new LinkedList<>());
+    }
+
+    /**
+     * Parses a lab. Assigns the lectures associated to this lab.
+     *
+     * @param line The content line.
+     */
+    private void parseLabSpecifier(final CharBuffer line) {
+        final Lab lab = parseLab(line);
+        final Lecture[] lectures = lab.getLectures();
+        for (final Lecture labLecture : lectures) {
+            final List<Lab> assigns = labAssignments.get(labLecture);
+            if (assigns == null) {
+                throw new AssertionError("Expected a lecture assignment list to exist before lab parsing.");
+            }
+            assigns.add(lab);
+        }
+        labs.add(lab);
+    }
+
+    /**
+     * Parses a new lecture.
+     *
+     * @param line The content line.
+     */
+    private Lecture parseLecture(final CharBuffer line) {
+        return (Lecture) parseCourse(line);
+    }
+
+    /**
+     * Parses a new lab.
+     *
+     * @param line The content line.
+     */
+    private Lab parseLab(final CharBuffer line) {
+        return (Lab) parseCourse(line);
+    }
+
+    /**
+     * Parses a course. This will create any new courses as necessary. Can
+     * deal with any of the following forms:
+     * <pre>{@code
+     * type number LEC section
+     * type number LEC section LAB section
+     * type number LEC section TUT section
+     * type number LAB section
+     * type number TUT section
+     * }</pre>
+     *
+     * @param line The content line.
+     */
     private Course parseCourse(final CharBuffer line) {
         final String course = line.nextIdentifier();
         line.skipSpaces();
@@ -244,6 +386,7 @@ public class InputParser {
         line.skipSpaces();
 
         final int lectureSection;
+        // determine if there is a lecture specifier or tutorial specifier.
         if (type.equals("LEC")) {
             lectureSection = line.nextInt();
         } else if (type.equals("TUT") || type.equals("LAB")) {
@@ -253,6 +396,8 @@ public class InputParser {
         }
         line.skipSpaces();
 
+        // if there are existing lectures for the given (type, number, section),
+        // then operate on these. This avoids duplicate entries as well.
         final List<Lecture> lectures = getLectures(course, number, lectureSection);
         final Lecture[] lecture;
         if (!lectures.isEmpty()) {
@@ -266,6 +411,7 @@ public class InputParser {
             };
         }
 
+        // there is a tutorial specifier following
         if (line.hasNext() && line.peek() != ',') {
             final String labType;
             if (type.equals("LAB") || type.equals("TUT")) {
@@ -304,23 +450,27 @@ public class InputParser {
         }
     }
 
-    private Lecture parseLecture(final CharBuffer line) {
-        return (Lecture) parseCourse(line);
-    }
-
-    private Lab parseLab(final CharBuffer line) {
-        return (Lab) parseCourse(line);
-    }
-
-    private NotCompatible parseNotCompatible(final CharBuffer line) {
+    /**
+     * Parses a new not-compatible specifier.
+     *
+     * @param line The content line.
+     */
+    private void parseNotCompatibleSpecifier(final CharBuffer line) {
         final Course left = parseCourse(line);
         line.skipComma();
         final Course right = parseCourse(line);
 
-        return new NotCompatible(left, right);
+        final NotCompatible compatible = new NotCompatible(left, right);
+        notCompatibles.add(compatible);
     }
 
-    private Unwanted parseUnwanted(final CharBuffer line) {
+    /**
+     * Parses a new unwanted specifier. If the slot is invalid, no unwanted
+     * is parsed.
+     *
+     * @param line The content line.
+     */
+    private void parseUnwantedSpecifier(final CharBuffer line) {
         final Course course = parseCourse(line);
         line.skipComma();
         final Day day = parseDay(line);
@@ -329,13 +479,20 @@ public class InputParser {
 
         // no point caring about it, if the slot can't be assigned to
         if (!Slot.exists(day, time)) {
-            return null;
+            return;
         }
 
-        return new Unwanted(Assign.getAssign(course, Slot.getSlot(day, time)));
+        final Unwanted unwanted = new Unwanted(Assign.getAssign(course, Slot.getSlot(day, time)));
+        this.unwanted.add(unwanted);
     }
 
-    private Preference parsePreference(final CharBuffer line) {
+    /**
+     * Parses a new preference specifier. If the slot is invalid, no
+     * preference is parsed.
+     *
+     * @param line The content line.
+     */
+    private void parsePreferenceSpecifier(final CharBuffer line) {
         final Day day = parseDay(line);
         line.skipComma();
         final Time time = parseTime(line);
@@ -346,21 +503,34 @@ public class InputParser {
 
         // no point caring about it, if the slot can't be assigned to
         if (!Slot.exists(day, time)) {
-            return null;
+            return;
         }
 
-        return new Preference(Assign.getAssign(course, Slot.getSlot(day, time)), value);
+        final Preference preference = new Preference(Assign.getAssign(course, Slot.getSlot(day, time)), value);
+        preferences.add(preference);
     }
 
-    private Pair parsePair(final CharBuffer line) {
+    /**
+     * Parses a new pair specifier.
+     *
+     * @param line The content line.
+     */
+    private void parsePairSpecifier(final CharBuffer line) {
         final Course left = parseCourse(line);
         line.skipComma();
         final Course right = parseCourse(line);
 
-        return new Pair(left, right);
+        final Pair pair = new Pair(left, right);
+        pairs.add(pair);
     }
 
-    private PartialAssign parsePartialAssign(final CharBuffer line) {
+    /**
+     * Parses a new partial assignment. If the slot is invalid, no
+     * assignment is parsed.
+     *
+     * @param line The content line.
+     */
+    private void parsePartialAssignSpecifier(final CharBuffer line) {
         final Course course = parseCourse(line);
         line.skipComma();
         final Day day = parseDay(line);
@@ -369,12 +539,18 @@ public class InputParser {
 
         // no point caring about it, if the slot can't be assigned to
         if (!Slot.exists(day, time)) {
-            return null;
+            return;
         }
 
-        return new PartialAssign(Assign.getAssign(course, Slot.getSlot(day, time)));
+        final PartialAssign partialAssign = new PartialAssign(Assign.getAssign(course, Slot.getSlot(day, time)));
+        partialAssigns.add(partialAssign);
     }
 
+    /**
+     * Parses a new time specifier. The format is: <code>HH:MM</code>.
+     *
+     * @param line The content line.
+     */
     private Time parseTime(final CharBuffer line) {
         final int hour = line.nextInt();
         final char c = line.next();
@@ -385,6 +561,12 @@ public class InputParser {
         return new Time(hour, minute);
     }
 
+    /**
+     * Parses a new {@link Day}. Must be one of <code>MO</code>,
+     * <code>TU</code>, <code>FR</code>.
+     *
+     * @param line The content line.
+     */
     private Day parseDay(final CharBuffer line) {
         final String day = line.nextIdentifier();
         switch (day) {
@@ -399,6 +581,15 @@ public class InputParser {
         }
     }
 
+    /**
+     * Retrieves all the lectures with the given type, number and section.
+     * If the section is not specified, multiple lectures may be returned.
+     *
+     * @param type    The course type to retrieve.
+     * @param number  The course number to retrieve.
+     * @param section The course section to retrieve. If <code>-1</code>,
+     *                all matching lectures are returned.
+     */
     private List<Lecture> getLectures(final String type, final int number, final int section) {
         final List<Lecture> lectures = new ArrayList<>();
         for (final Lecture lecture : this.lectures) {
@@ -411,6 +602,11 @@ public class InputParser {
         return lectures;
     }
 
+    /**
+     * Character buffer for parsing. Used to provide easy parsing methods
+     * for lookup,
+     * peeking and processing.
+     */
     private static class CharBuffer {
 
         private int mark = -1;
@@ -423,10 +619,19 @@ public class InputParser {
             this.chars = input.toCharArray();
         }
 
+        /**
+         * Marks the current position.
+         */
         private void mark() {
             this.mark = read;
         }
 
+        /**
+         * Retrieves the current content from the mark to the current
+         * index. Requires a call to <code>mark</code> before this.
+         *
+         * @return The substring from <code>(mark, current)</code>.
+         */
         private String retrieve() {
             if (mark == -1) {
                 throw new IllegalStateException("buffer must be marked before retrieval.");
@@ -448,6 +653,9 @@ public class InputParser {
             return read < chars.length;
         }
 
+        /**
+         * Skips all spaces in the content.
+         */
         private void skipSpaces() {
             while (hasNext()) {
                 if (peek() != ' ') {
@@ -457,6 +665,9 @@ public class InputParser {
             }
         }
 
+        /**
+         * Parses a comma, then skips all following spaces.
+         */
         private void skipComma() {
             final char comma = next();
             if (comma != ',') {
@@ -465,6 +676,11 @@ public class InputParser {
             skipSpaces();
         }
 
+        /**
+         * Parses a decimal integer. Does not provide overflow protection.
+         *
+         * @return The integer parsed from the input.
+         */
         private int nextInt() {
             int parse = 0;
             boolean negative = false;
@@ -482,6 +698,12 @@ public class InputParser {
             return negative ? -parse : parse;
         }
 
+        /**
+         * Parses the next identifier. A valid identifier character is any
+         * alphabetical, digit, or underscore.
+         *
+         * @return The parsed identifier.
+         */
         private String nextIdentifier() {
             mark();
             while (hasNext()) {
