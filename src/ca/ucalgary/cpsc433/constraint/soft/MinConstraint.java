@@ -6,7 +6,7 @@ import ca.ucalgary.cpsc433.schedule.Schedule;
 import ca.ucalgary.cpsc433.schedule.Slot;
 
 /**
- * @author Obicere
+ * Soft Constraint for the minimum labs and lectures for a particular slot 
  */
 public class MinConstraint implements SoftConstraint {
 
@@ -16,13 +16,20 @@ public class MinConstraint implements SoftConstraint {
 
     private final int weight;
 
+    /**
+     * Constructor that initializes the penalty and weight values of the constraint
+     */
     public MinConstraint() {
         this.penaltyLab = Main.getProperty("pLab", 20);
         this.penaltyLecture = Main.getProperty("pLec", 20);
         this.weight = Main.getProperty("wMin", 5);
     }
 
-    @Override
+    /**
+     * Applies the penalty amount if constraint violated
+     * @param schedule current schedule being checked
+     * @return penalty value to be applied
+     */
     public int getPenalty(final Schedule schedule) {
         int penalty = 0;
         final Environment environment = schedule.getEnvironment();
@@ -40,7 +47,10 @@ public class MinConstraint implements SoftConstraint {
         return penalty;
     }
 
-    @Override
+    /**
+     * Getter for weight variable
+     * @return weight value to be applied to the penalty 
+     */
     public int getWeight() {
         return weight;
     }

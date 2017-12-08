@@ -13,7 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * @author Obicere
+ * Soft Constraint for pair(a,b) where if assign(a) != assign(b)
+ * then a penalty will be applied 
  */
 public class PairConstraint implements SoftConstraint {
 
@@ -24,13 +25,20 @@ public class PairConstraint implements SoftConstraint {
     private List<List<Course>> pairCourses;
 
     private boolean initialized = false;
-
+    
+    /**
+     * Constructor that initializes the penalty value and its weight
+     */
     public PairConstraint() {
         this.penalty = Main.getProperty("pPair", 15);
         this.weight = Main.getProperty("wPair", 4);
     }
 
-    @Override
+    /**
+     * Checks if the constraint is satisfied or not, if it is then adds a penalty
+     * @param schedule the current schedule to be checked
+     * @return penalty value to be applied to the schedule
+     */
     public int getPenalty(final Schedule schedule) {
         if (!initialized) {
             initialize(schedule.getEnvironment());
@@ -63,11 +71,18 @@ public class PairConstraint implements SoftConstraint {
         return penalty;
     }
 
-    @Override
+    /**
+     * Getter for weight variable
+     * @return weight weight value of the constraint
+     */
     public int getWeight() {
         return weight;
     }
 
+    /**
+     * Initializes a list of lists of pairCourses, pair(a,b)
+     * @param environment where the values are obtained from
+     */
     private void initialize(final Environment environment) {
         initialized = true;
 

@@ -9,17 +9,25 @@ import ca.ucalgary.cpsc433.schedule.Schedule;
 import ca.ucalgary.cpsc433.schedule.Slot;
 
 /**
- * @author Obicere
+ * Soft Constraint for the preference of a course to be scheduled at a particular time.
+ * If the assign does not equal the preferred slot the pref value will be applied as a penalty
  */
 public class PreferenceConstraint implements SoftConstraint {
 
     private final int weight;
 
+    /**
+     * Constructor value for initializing the weight of the constraint
+     */
     public PreferenceConstraint() {
         this.weight = Main.getProperty("wPref", 5);
     }
 
-    @Override
+    /**
+     * If the constraint is violated then the penalty value will be calculated
+     * @param schedule current schedule being checked
+     * @return penalty int value to be added
+     */
     public int getPenalty(final Schedule schedule) {
         final Environment environment = schedule.getEnvironment();
         if (!environment.hasPreferences()) {
@@ -51,7 +59,10 @@ public class PreferenceConstraint implements SoftConstraint {
         return penalty;
     }
 
-    @Override
+    /**
+     * Getter for weight variable
+     * @return weight multiplier value for penalty
+     */
     public int getWeight() {
         return weight;
     }

@@ -7,11 +7,14 @@ import ca.ucalgary.cpsc433.schedule.Assign;
 import ca.ucalgary.cpsc433.schedule.Schedule;
 import ca.ucalgary.cpsc433.schedule.Slot;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
- * @author Obicere
+ * Soft Constraint that adds a certain penalty value if there is a
+ * violation of the constraint. 
  */
 public class SectionConstraint implements SoftConstraint {
 
@@ -22,13 +25,19 @@ public class SectionConstraint implements SoftConstraint {
     private boolean initialized = false;
 
     private Set<Lecture[]> lectureGroups;
-
+    
+    /**
+     * Constructor that initializes the weight and penalty value for the soft constraint
+     */
     public SectionConstraint() {
         this.penalty = Main.getProperty("pSec", 10);
         this.weight = Main.getProperty("wSec", 3);
     }
 
-    @Override
+    /**
+     * @param schedule the current schedule that is checked for penalties
+     * @return penalty integer value to be added
+     */
     public int getPenalty(final Schedule schedule) {
         if (!initialized) {
             initialize(schedule.getEnvironment());
@@ -53,11 +62,18 @@ public class SectionConstraint implements SoftConstraint {
         return penalty;
     }
 
-    @Override
+    /**
+     * Getter for weight
+     * @return weight of penalty
+     */
     public int getWeight() {
         return weight;
     }
 
+    /**
+     * Initializes a Set of Lectures to be compared to
+     * @param environment where the Lectures are obtained from
+     */
     private void initialize(final Environment environment) {
         initialized = true;
 
@@ -67,7 +83,14 @@ public class SectionConstraint implements SoftConstraint {
 
         for (final Lecture lecture : lectures) {
             final Lecture[] others = environment.getLectures(lecture.getType(), lecture.getNumber());
-            lectureGroups.add(others);
+            final List<Lecture> filtered = new ArrayList<>();
+            for (final Lecture other : others){
+            	if (other.getID() >= lecture.getID()){
+            		filtered.add(other);
+            	}
+            }
+            final Lecture[] newList = filtered.toArray(new Lecture[filtered.size()]);
+            lectureGroups.add(newList);
         }
     }
 }
