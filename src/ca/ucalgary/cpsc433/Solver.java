@@ -76,8 +76,8 @@ public class Solver implements Runnable {
     }
 
     private PriorityQueue<Schedule> initSchedules() {
-        final OrTree firstTree = new OrTree(environment);
-        final Schedule first = firstTree.search();
+        final OrTree solver = new OrTree(environment);
+        final Schedule first = solver.search();
 
         if (first == null) {
             return null;
@@ -87,8 +87,7 @@ public class Solver implements Runnable {
         schedules.add(first);
 
         for (int i = 1; i < setinit; i++) {
-            final OrTree tree = new OrTree(environment);
-            final Schedule next = tree.search();
+            final Schedule next = solver.search();
             if (next == null) {
                 throw new AssertionError("Schedule should not be null. Error with tree.");
             }
