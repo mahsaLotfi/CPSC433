@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * Lab class will implements the Course interface.
+ * 
  * @author Obicere
  */
 public class Lab implements Course {
@@ -49,10 +51,23 @@ public class Lab implements Course {
         return labs;
     }
 
+    /**
+     * Returns the id which is an string of type, number and section put together.
+     * @param type
+     * @param number
+     * @param section
+     * @return
+     */
     private static String getCacheID(final String type, final int number, final int section) {
         return type + number + section;
     }
 
+    /**
+     * This Constructor will initialize type, number & section with use of arguments provided.
+     * @param lecture
+     * @param isLab
+     * @param section
+     */
     Lab(final Lecture[] lecture, final boolean isLab, final int section) {
         if (lecture == null) {
             throw new NullPointerException("lecture must be non-null");
@@ -66,39 +81,68 @@ public class Lab implements Course {
         this.labID = labCount++;
     }
 
+    /**
+     * Getter method for lab ID.
+     * @return labID
+     */
     @Override
     public int getID() {
         return labID;
     }
 
+    /**
+     * Getter method for lectures.
+     * @return lecture[]
+     */
     public Lecture[] getLectures() {
         return lecture;
     }
 
+    /**
+     * Returns true if the object is a Lab.
+     * @return
+     */
     public boolean isLab() {
         return isLab;
     }
 
+    /**
+     * Getter for number
+     */
     @Override
     public int getNumber() {
         return lecture[0].getNumber();
     }
 
+    /**
+     * Getter for type
+     */
     @Override
     public String getType() {
         return lecture[0].getType();
     }
 
+    /**
+     * Getter for section
+     */
     @Override
     public int getSection() {
         return section;
     }
 
+    /**
+     * Returns false if the object is Lecture.
+     */
     @Override
     public boolean isLecture() {
         return false;
     }
 
+    /**
+     * Compares Course object o with a Lab object. Returns 0 if they are the same, 
+     * returns 1 if o is a Lecture object.
+     * @return int
+     */
     @Override
     public int compareTo(final Course o) {
         if (o instanceof Lecture) {
@@ -116,6 +160,10 @@ public class Lab implements Course {
         return getType().compareTo(other.getType());
     }
 
+    /**
+     * Returns hash code value.
+     * @return int
+     */
     @Override
     public int hashCode() {
         int h = 27;
@@ -125,6 +173,11 @@ public class Lab implements Course {
         return h;
     }
 
+    /**
+     * Returns true if the argument's type, number & section is 
+     * equal to the current object. False if not.
+     * @return boolean
+     */
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -140,6 +193,10 @@ public class Lab implements Course {
         return getNumber() == other.getNumber() && getSection() == other.getSection() && getType().equals(other.getType());
     }
 
+    /**
+     * Builds a string.
+     * @return String
+     */
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
