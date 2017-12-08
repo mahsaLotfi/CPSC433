@@ -29,8 +29,7 @@ public class CourseConstraint implements HardConstraint {
             for (final Lab lab : labs) {
                 final Assign labAssign = schedule.getAssign(lab);
                 if (labAssign != null) {
-                    if (lectureSlot.equals(labAssign.getSlot())) {
-                    // if (assign.collides(labAssign)) {
+                    if (lectureSlot == labAssign.getSlot() || assign.collides(labAssign)) {
                         return false;
                     }
                 }
