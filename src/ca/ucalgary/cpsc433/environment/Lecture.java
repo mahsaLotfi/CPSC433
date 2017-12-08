@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ *  Lecture class will implements the Course interface.
+ *  
  * @author Obicere
  */
 public class Lecture implements Course {
@@ -23,6 +25,7 @@ public class Lecture implements Course {
 
     private final int section;
 
+    
     public static Lecture getLecture(final String type, final int number, final int section) {
         final String id = getCacheID(type, number, section);
         final Lecture cached = CACHE.get(id);
@@ -47,10 +50,23 @@ public class Lecture implements Course {
         return lectures;
     }
 
+    /**
+     * Returns the id which is an string of type, number and section put together.
+     * @param type
+     * @param number
+     * @param section
+     * @return String
+     */
     private static String getCacheID(final String type, final int number, final int section) {
         return type + number + section;
     }
 
+    /**
+     * This Constructor will initialize type, number & section with use of arguments provided.
+     * @param type
+     * @param number
+     * @param section
+     */
     Lecture(final String type, final int number, final int section) {
         if (type == null || type.isEmpty()) {
             throw new NullPointerException("type must be non-null and non-empty");
@@ -62,11 +78,19 @@ public class Lecture implements Course {
         this.lectureID = lectureCount++;
     }
 
+    /**
+     * Getter method for lecture ID.
+     * @return lectureID
+     */
     @Override
     public int getID() {
         return lectureID;
     }
 
+    /**
+     * Setter method for labs.
+     * @return section
+     */
     public void setLabs(final Lab[] labs) {
         if (this.labs != null) {
             throw new AssertionError("labs already initialized");
@@ -77,6 +101,10 @@ public class Lecture implements Course {
         this.labs = labs.clone();
     }
 
+    /**
+     * Getter method for labs. 
+     * @return labs
+     */
     public Lab[] getLabs() {
         if (labs == null) {
             throw new AssertionError("Lecture has not yet been fully initialized.");
@@ -84,26 +112,48 @@ public class Lecture implements Course {
         return labs.clone();
     }
 
+    /**
+     * Getter method for number.
+     * @return number
+     */
     @Override
     public int getNumber() {
         return number;
     }
 
+    /**
+     * Getter method for type.
+     * @return type
+     */
     @Override
     public String getType() {
         return type;
     }
 
+    /**
+     * Getter method for section.
+     * @return section
+     */
     @Override
     public int getSection() {
         return section;
     }
 
+    /**
+     * Returns true if the object is a Lecture object. False if it is not.
+     * @return boolean
+     */
     @Override
     public boolean isLecture() {
         return true;
     }
 
+    
+    /**
+     * Compares Course object o with a Lecture object. Returns 0 if they are the same, 
+     * returns -1 if o is a Lab object.
+     * @return int
+     */
     @Override
     public int compareTo(final Course o) {
         if (o instanceof Lab) {
@@ -121,6 +171,11 @@ public class Lecture implements Course {
         return getType().compareTo(other.getType());
     }
 
+    
+    /**
+     * Returns hash code value.
+     * @return int
+     */
     @Override
     public int hashCode() {
         int h = 27;
@@ -130,6 +185,11 @@ public class Lecture implements Course {
         return h;
     }
 
+    /**
+     * Returns true if the argument's type, number & section is 
+     * equal to the current object. False if not.
+     * @return boolean
+     */
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -145,6 +205,10 @@ public class Lecture implements Course {
         return getType().equals(other.getType()) && getNumber() == other.getNumber() && getSection() == other.getSection();
     }
 
+    /**
+     * Building the string with this structure: type + " " + number + " LEC " + section
+     * @return String 
+     */
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();

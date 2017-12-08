@@ -23,6 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * This class will build an environment for search. 
+ * 
  * @author Obicere
  */
 public class Environment {
@@ -77,6 +79,9 @@ public class Environment {
 
     private final CourseDirectory directory;
 
+    /**
+     * adding all hard/soft constraints into hard/soft Arraylists.
+     */
     static {
         final List<HardConstraint> hard = new ArrayList<>();
         hard.add(new MaxConstraint());
@@ -101,6 +106,17 @@ public class Environment {
         SOFT_CONSTRAINTS = soft.toArray(new SoftConstraint[soft.size()]);
     }
 
+    /**
+     * Constructor to initialize all the instance variables.
+     * @param name
+     * @param lectureSlots
+     * @param labSlots
+     * @param notCompatibles
+     * @param unwanted
+     * @param preferences
+     * @param pairs
+     * @param partialAssigns
+     */
     public Environment(final String name, final Slot[] lectureSlots, final Slot[] labSlots, final NotCompatible[] notCompatibles, final Unwanted[] unwanted, final Preference[] preferences, final Pair[] pairs, final PartialAssign[] partialAssigns) {
         this.name = name;
         this.lectureSlots = lectureSlots;
@@ -130,6 +146,11 @@ public class Environment {
         this.partialAssigns = buildPartialAssigns(partialAssigns);
     }
 
+    /**
+     * A method to build a 2D_list of NotCompatible courses.
+     * @param notCompatibles
+     * @return
+     */
     private Course[][] buildNotCompatibles(final NotCompatible[] notCompatibles) {
         final Course[][] value = new Course[courses.length][];
         for (int i = 0; i < courses.length; i++) {
@@ -147,6 +168,11 @@ public class Environment {
         return value;
     }
 
+    /**
+     * A method to build a 2D_list of Unwanted courses.
+     * @param unwanteds
+     * @return
+     */
     private Unwanted[][] buildUnwanted(final Unwanted[] unwanteds) {
         final Unwanted[][] value = new Unwanted[courses.length][];
         for (int i = 0; i < courses.length; i++) {
@@ -162,6 +188,11 @@ public class Environment {
         return value;
     }
 
+    /**
+     * A method to build a 2D_list of Preference courses.
+     * @param preferences
+     * @return
+     */
     private Preference[][] buildPreferences(final Preference[] preferences) {
         final Preference[][] value = new Preference[courses.length][];
         for (int i = 0; i < courses.length; i++) {
@@ -177,6 +208,11 @@ public class Environment {
         return value;
     }
 
+    /**
+     * A method to build a 2D_list of Pair courses.
+     * @param pairs
+     * @return
+     */
     private Course[][] buildPairs(final Pair[] pairs) {
         final Course[][] value = new Course[courses.length][];
         for (int i = 0; i < courses.length; i++) {
@@ -194,6 +230,11 @@ public class Environment {
         return value;
     }
 
+    /**
+     * A method to build a list of PartialAssign courses.
+     * @param partialAssigns
+     * @return
+     */
     private PartialAssign[] buildPartialAssigns(final PartialAssign[] partialAssigns) {
         final PartialAssign[] value = new PartialAssign[courses.length];
         for (final PartialAssign partialAssign : partialAssigns) {
@@ -205,6 +246,12 @@ public class Environment {
         return value;
     }
 
+    
+    /**
+     * Getters
+     */
+    
+    
     public String getName() {
         return name;
     }
@@ -281,6 +328,11 @@ public class Environment {
         }
     }
 
+    /**
+     * Getter method for nonCompatibles
+     * @param course
+     * @return Course[]
+     */
     public Course[] getNonCompatibles(final Course course) {
         final int id = getCourseID(course);
         final Course[] result = notCompatibles[id];
@@ -291,10 +343,19 @@ public class Environment {
         }
     }
 
+    /**
+     * Returns true if notCompatibleCount is bigger than zero.
+     * @return boolean
+     */
     public boolean hasNonCompatibles() {
         return notCompatibleCount > 0;
     }
 
+    /**
+     * Getter method for Unwanted.
+     * @param course
+     * @return Unwanted[]
+     */
     public Unwanted[] getUnwanted(final Course course) {
         final int id = getCourseID(course);
         final Unwanted[] result = unwanted[id];
@@ -304,7 +365,11 @@ public class Environment {
             return result;
         }
     }
-
+    
+    /**
+     * Returns true if unwantedCount is bigger than zero.
+     * @return boolean
+     */
     public boolean hasUnwanted() {
         return unwantedCount > 0;
     }
@@ -318,7 +383,11 @@ public class Environment {
             return result;
         }
     }
-
+    
+    /**
+     * Returns true if preferenceCount is bigger than zero.
+     * @return boolean
+     */
     public boolean hasPreferences() {
         return preferenceCount > 0;
     }
@@ -332,7 +401,11 @@ public class Environment {
             return result;
         }
     }
-
+    
+    /**
+     * Returns true if pairsCount is bigger than zero.
+     * @return boolean
+     */
     public boolean hasPairs() {
         return pairsCount > 0;
     }
@@ -341,7 +414,11 @@ public class Environment {
         final int id = getCourseID(course);
         return partialAssigns[id];
     }
-
+    
+    /**
+     * Returns true if partialAssignsCount is bigger than zero.
+     * @return boolean
+     */
     public boolean hasPartialAssigns() {
         return partialAssignsCount > 0;
     }
