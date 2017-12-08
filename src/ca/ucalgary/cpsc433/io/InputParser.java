@@ -177,12 +177,21 @@ public class InputParser {
         if (!cpsc313.isEmpty() && cpsc813.isEmpty()) {
             final Lecture newLecture = Lecture.getLecture("CPSC", 813, 1);
             newLecture.setLabs(new Lab[0]);
-            Slot.getSlot(Day.TUESDAY, new Time(18, 0));
+            final Slot newSlot = Slot.getSlot(Day.TUESDAY, new Time(18, 0));
+            newSlot.setLectureLimit(0, newSlot.getLectureMax() + 1);
+            lectureSlots.add(newSlot);
+
+            partialAssigns.add(new PartialAssign(Assign.getAssign(newLecture, newSlot)));
         }
         if (!cpsc413.isEmpty() && cpsc913.isEmpty()) {
             final Lecture newLecture = Lecture.getLecture("CPSC", 913, 1);
             newLecture.setLabs(new Lab[0]);
-            Slot.getSlot(Day.TUESDAY, new Time(18, 0));
+            final Slot newSlot = Slot.getSlot(Day.TUESDAY, new Time(18, 0));
+            newSlot.setLectureLimit(0, newSlot.getLectureMax() + 1);
+            lectureSlots.add(newSlot);
+
+            final PartialAssign assign = new PartialAssign(Assign.getAssign(newLecture, newSlot));
+            partialAssigns.add(assign);
         }
 
 

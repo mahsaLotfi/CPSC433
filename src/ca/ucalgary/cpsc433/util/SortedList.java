@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.PriorityQueue;
 
@@ -37,7 +38,7 @@ import java.util.PriorityQueue;
  * @author Obicere
  * @version 1.0
  */
-public class SortedList<T extends Comparable<? super T>> extends ArrayList<T> {
+public class SortedList<T> extends ArrayList<T> {
 
     /**
      * The <code>comparator</code> instance is used to provide a separate
@@ -264,8 +265,7 @@ public class SortedList<T extends Comparable<? super T>> extends ArrayList<T> {
 
     @SuppressWarnings("unchecked")
     private int findIndexFor(final T content) {
-        return Collections.binarySearch(this, content);
-        /*if (comparator == null) {
+        if (comparator == null) {
             if (content instanceof Comparable) {
                 return Collections.binarySearch((List<Comparable<T>>) this, content);
             } else {
@@ -273,6 +273,6 @@ public class SortedList<T extends Comparable<? super T>> extends ArrayList<T> {
             }
         } else {
             return Collections.binarySearch(this, content, comparator);
-        }*/
+        }
     }
 }

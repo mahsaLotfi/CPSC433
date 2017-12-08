@@ -15,8 +15,10 @@ import java.util.Set;
 
 /**
  * Hard Constraint for CPSC 913 that is scheduled Tu/Th 1800-1900 and not
- * allowed to overlap with any labs/tutorials of cpsc313 or course sections
- * of cpsc413 and transitively with any other courses that are not allowed to overlap
+ * allowed to overlap with any labs/tutorials of cpsc313 or course
+ * sections
+ * of cpsc413 and transitively with any other courses that are not allowed
+ * to overlap
  * with cpsc413
  */
 public class CPSC913Constraint implements HardConstraint {
@@ -31,6 +33,7 @@ public class CPSC913Constraint implements HardConstraint {
 
     /**
      * Checks if the hard constraint is satisfied
+     *
      * @param schedule current schedule being checked
      * @return true if there are no conflicts with cpsc913
      */
@@ -52,8 +55,8 @@ public class CPSC913Constraint implements HardConstraint {
                 continue;
             }
             final Slot assigned = assign.getSlot();
-            if (!assigned.equals(target)){
-            	return false;
+            if (!assigned.equals(target)) {
+                return false;
             }
             for (int i = 0; i < nonCompatibles.length; i++) {
                 if (assigns[i] != null && assigns[i].collides(assign)) {
@@ -67,6 +70,7 @@ public class CPSC913Constraint implements HardConstraint {
 
     /**
      * Creates an array of courses that are not compatible with cpsc913
+     *
      * @param environment that the lectures are obtained from
      */
     private void initialize(final Environment environment) {
@@ -77,7 +81,7 @@ public class CPSC913Constraint implements HardConstraint {
             return;
         }
         this.cpsc913 = lectures;
-        
+
         final Time time = new Time(18, 0);
         if (!Slot.exists(Day.TUESDAY, time)) {
             return;
@@ -96,12 +100,13 @@ public class CPSC913Constraint implements HardConstraint {
         if (courses.isEmpty()) {
             return;
         }
-
+        
         nonCompatibles = courses.toArray(new Course[courses.size()]);
     }
 
     /**
      * Determines whether the constraint can be enforced or not
+     *
      * @return true if cpsc913 exits and nonCompatibles/target are not null
      */
     private boolean canBeEnforced() {

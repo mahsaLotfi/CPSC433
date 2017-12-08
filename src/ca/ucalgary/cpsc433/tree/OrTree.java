@@ -14,12 +14,14 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
+ * Implementation of the Or-Tree, specifically tuned for the class
+ * scheduling problem. This generates a random schedule, with no guarantee
+ * of returning the best schedule. Subsequent methods should be applied to
+ * refine the solution from this search.
+ *
  * @author Obicere
  */
 public class OrTree {
-
-    // this needs to be really memory efficient
-    // state will take care of this. No Schedule objects should be used until the final schedule is procurred.
 
     private final Environment environment;
 
@@ -33,6 +35,7 @@ public class OrTree {
 
     private final SecureRandom random;
 
+    // stores the current depth
     private int depth = 0;
 
     private Assign[] schedule;
@@ -52,13 +55,15 @@ public class OrTree {
         State current = new State(null, getSubtreeSize(0));
 
         int j = 0;
+        // partial assignments have top priority
         for (int i = 0; i < lectures.length; i++) {
             if (environment.getPartialAssign(lectures[i]) != null) {
                 swap(lectures, i, j);
                 j++;
-                continue;
             }
-
+        }
+        // evening, unwanted and 5XX lectures have second priority
+        for (int i = 0; i < lectures.length; i++) {
             final int section = lectures[i].getSection();
             if (section >= 90) {
                 swap(lectures, i, j);
@@ -80,14 +85,18 @@ public class OrTree {
             }
         }
 
+
+
         j = 0;
+        // partial assignments have top priority
         for (int i = 0; i < labs.length; i++) {
             if (environment.getPartialAssign(labs[i]) != null) {
                 swap(labs, i, j);
                 j++;
-                continue;
             }
-
+        }
+        // evening, unwanted and 5XX lectures have second priority
+        for (int i = 0; i < labs.length; i++) {
             final int section = labs[i].getSection();
             if (section >= 90) {
                 swap(labs, i, j);

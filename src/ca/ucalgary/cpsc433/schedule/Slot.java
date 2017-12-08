@@ -27,10 +27,6 @@ public class Slot implements Comparable<Slot> {
 
     private int labMin = 0;
 
-    private boolean lectureInit = false;
-
-    private boolean labInit = false;
-
     public static Slot getSlot(final Day day, final Time time) {
         final int id = getCacheID(day, time);
         final Slot cached = CACHE.get(id);
@@ -108,21 +104,13 @@ public class Slot implements Comparable<Slot> {
     }
 
     public void setLectureLimit(final int min, final int max) {
-        if (lectureInit) {
-            return;
-        }
         this.lectureMax = max;
         this.lectureMin = min;
-        this.lectureInit = true;
     }
 
     public void setLabLimit(final int min, final int max) {
-        if (labInit) {
-            return;
-        }
         this.labMax = max;
         this.labMin = min;
-        this.labInit = true;
     }
 
     public int getLabMax() {

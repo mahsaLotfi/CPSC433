@@ -68,24 +68,26 @@ public class Main {
         final long seconds = (end % 60000) / 1000;
         final long milliseconds = (end % 1000);
 
-        // System.out.printf("Done in %d:%02d:%03d%n%n", minutes, seconds, milliseconds);
+        System.out.printf("Done in %d:%02d:%03d%n%n", minutes, seconds, milliseconds);
 
         final Schedule solution = solver.getSolution();
 
-        System.out.println("Evaluation: " + solution.getEvaluation());
+        if (solution != null) {
+            System.out.println("Evaluation: " + solution.getEvaluation());
 
-        final Slot[] slots = environment.getSlots();
-        Arrays.sort(slots);
+            final Slot[] slots = environment.getSlots();
+            Arrays.sort(slots);
 
-        for (final Slot slot : slots) {
-            final Course[] courses = solution.getCourses(slot);
+            for (final Slot slot : slots) {
+                final Course[] courses = solution.getCourses(slot);
 
-            if (courses.length > 0) {
-                System.out.println(slot);
-                for (final Course course : courses) {
-                    System.out.println("  " + course);
+                if (courses.length > 0) {
+                    System.out.println(slot);
+                    for (final Course course : courses) {
+                        System.out.println("  " + course);
+                    }
+                    System.out.println();
                 }
-                System.out.println();
             }
         }
     }

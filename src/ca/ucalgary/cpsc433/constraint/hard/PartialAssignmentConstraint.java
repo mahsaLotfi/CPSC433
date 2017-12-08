@@ -34,7 +34,7 @@ public class PartialAssignmentConstraint implements HardConstraint {
         for (final PartialAssign partialAssign : partialCourses) {
             final Assign assign = partialAssign.getAssign();
             final Assign actual = schedule.getAssign(assign.getCourse());
-            if (!assign.equals(actual)) {
+            if (actual != null && !assign.equals(actual)) {
                 return false;
             }
         }

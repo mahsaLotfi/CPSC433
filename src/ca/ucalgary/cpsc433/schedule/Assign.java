@@ -16,6 +16,10 @@ public class Assign {
 
     private final Slot slot;
 
+    private Slot secondSlot;
+
+    private boolean secondSlotInitialized = false;
+
     private Time endTime;
 
     public static Assign getAssign(final Course course, final Slot slot) {
@@ -76,9 +80,27 @@ public class Assign {
         if (slot == other.slot) {
             return true;
         }
-        final Time start = getStartTime();
-        final Time end = getEndTime();
-        return other.contains(start) || other.contains(end);
+        return getSecondSlot() == other.getSlot() || other.getSecondSlot() == slot;
+    }
+
+    private Slot getSecondSlot() {
+        if (secondSlotInitialized) {
+            return secondSlot;
+        }
+        secondSlotInitialized = true;
+        if (slot.getDay() == Day.TUESDAY && course.isLecture()) {
+            final Time time = slot.getTime();
+            final Time other;
+            if (time.getMinute() == 0) {
+                other = time.add(1, 0);
+            } else {
+                other = time.add(0, 30);
+            }
+            if (Slot.exists(Day.TUESDAY, other)) {
+                secondSlot = Slot.getSlot(Day.TUESDAY, other);
+            }
+        }
+        return secondSlot;
     }
 
     @Override
